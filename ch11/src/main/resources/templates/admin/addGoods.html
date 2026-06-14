@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <base th:href="@{/}">
+    <meta charset="UTF-8">
+    <title>添加商品</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css"/>
+</head>
+<body>
+    <div th:replace="admin/header :: header"></div>
+    <div class="container" style="max-width:500px;margin-top:30px;">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">添加商品</h3>
+            </div>
+            <div class="panel-body">
+                <form th:action="@{goods/addGoods?act=add}" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label>商品名称</label>
+                        <input type="text" name="gname" class="form-control"/>
+                    </div>
+                    <div class="form-group">
+                        <label>原价</label>
+                        <input type="text" name="goprice" class="form-control"/>
+                    </div>
+                    <div class="form-group">
+                        <label>现价</label>
+                        <input type="text" name="grprice" class="form-control"/>
+                    </div>
+                    <div class="form-group">
+                        <label>库存</label>
+                        <input type="text" name="gstore" class="form-control"/>
+                    </div>
+                    <div class="form-group">
+                        <label>商品图片</label>
+                        <input type="file" name="fileName" class="form-control"/>
+                    </div>
+                    <div class="form-group">
+                        <label>是否推荐</label>
+                        <select name="isRecommend" class="form-control">
+                            <option value="1">是</option>
+                            <option value="0">否</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>是否广告</label>
+                        <select name="isAdvertisement" class="form-control">
+                            <option value="1">是</option>
+                            <option value="0">否</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>商品类型</label>
+                        <select name="goodstype_id" class="form-control">
+                            <option th:each="gt:${goodsType}" th:value="${gt.id}" th:text="${gt.typename}"></option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">添加</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

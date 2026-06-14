@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <base th:href="@{/}">
+    <meta charset="UTF-8">
+    <title>订单管理</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css"/>
+</head>
+<body>
+    <div th:replace="admin/header :: header"></div>
+    <br><br><br>
+    <div class="container">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">订单列表</h3>
+            </div>
+            <div class="panel-body">
+                <div class="table table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <tbody class="text-center">
+                            <tr>
+                                <th>订单ID</th>
+                                <th>用户邮箱</th>
+                                <th>金额</th>
+                                <th>状态</th>
+                                <th>下单时间</th>
+                            </tr>
+                            <tr th:each="order:${allOrders}">
+                                <td th:text="${order.id}"></td>
+                                <td th:text="${order.bemail}"></td>
+                                <td th:text="${order.amount}"></td>
+                                <td th:text="${order.status==1}?'已支付':'未支付'"></td>
+                                <td th:text="${order.orderdate}"></td>
+                            </tr>
+                            <tr>
+                                <td colspan="5" align="right">
+                                    <ul class="pagination">
+                                        <li><a>第</a> <span th:text="${currentPage}"></span></li>
+                                        <li><a>共</a> <span th:text="${totalPage}"></span></li>
+                                        <a th:href="@{adminOrder/selectOrder(currentPage=${currentPage-1})}">上一页</a>
+                                        <span th:if="${currentPage} != ${totalPage}">
+                                            <a th:href="@{adminOrder/selectOrder(currentPage=${currentPage+1})}">下一页</a>
+                                        </span>
+                                    </ul>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

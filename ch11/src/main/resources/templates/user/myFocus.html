@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <base th:href="@{/}">
+    <meta charset="UTF-8">
+    <title>我的收藏</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css"/>
+</head>
+<body>
+    <div th:replace="user/header :: header"></div>
+    <div class="container">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">我的收藏</h3>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-xs-6 col-md-2" th:each="f:${myFocus}">
+                        <a th:href="'goodsDetail?id='+${f.id}" class="thumbnail">
+                            <img th:src="'images/'+${f.gpicture}" style="height:150px;width:100%;display:block;"/>
+                        </a>
+                        <div class="caption" style="text-align:center;">
+                            <span th:text="${f.gname}"></span>
+                        </div>
+                        <div style="text-align:center;">
+                            <span style="color:red;">&yen; <span th:text="${f.grprice}"></span></span>
+                            <span style="text-decoration:line-through;">&yen; <span th:text="${f.goprice}"></span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

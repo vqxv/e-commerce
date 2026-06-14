@@ -1,0 +1,9 @@
+# eBusiness 电子商务系统预览配置
+autoOpen: true
+apps:
+  - port: 8080
+    run: cd ch11 && service mysql start 2>/dev/null; sleep 1; mvn spring-boot:run
+    root: ch11
+    name: eBusiness
+    description: Spring Boot + MyBatis + Thymeleaf 电子商务系统
+    autoOpen: true

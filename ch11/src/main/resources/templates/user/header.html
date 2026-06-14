@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <nav th:fragment="header" class="navbar navbar-default" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" th:href="@{/}">电子商务</a>
+            </div>
+            <div class="collapse navbar-collapse">
+                <form class="navbar-form navbar-left" th:action="@{search}" method="post">
+                    <div class="form-group">
+                        <input type="text" name="mykey" class="form-control" placeholder="搜索商品"/>
+                    </div>
+                    <button type="submit" class="btn btn-default">搜索</button>
+                </form>
+                <ul class="nav navbar-nav" th:if="${goodsType != null}">
+                    <li th:each="gt:${goodsType}">
+                        <a th:href="@{/(tid=${gt.id})}" th:text="${gt.typename}"></a>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li th:if="${session.bUser==null}">
+                        <a th:href="@{user/toLogin}">登录</a>
+                    </li>
+                    <li th:if="${session.bUser==null}">
+                        <a th:href="@{user/toRegister}">注册</a>
+                    </li>
+                    <li th:if="${session.bUser!=null}">
+                        <a th:href="@{cart/selectCart}">购物车</a>
+                    </li>
+                    <li th:if="${session.bUser!=null}">
+                        <a th:href="@{cart/myFocus}">我的收藏</a>
+                    </li>
+                    <li th:if="${session.bUser!=null}">
+                        <a th:href="@{cart/myOrder}">我的订单</a>
+                    </li>
+                    <li th:if="${session.bUser!=null}">
+                        <a th:href="@{user/loginOut}">退出</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container" th:if="${advertisementGoods != null}">
+        <div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="2000">
+            <div class="carousel-inner">
+                <div class="item" th:each="ad:${advertisementGoods}" th:classappend="${adStat.index==0}?'active':''">
+                    <img th:src="'images/'+${ad.gpicture}" style="width:100%;height:200px;"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

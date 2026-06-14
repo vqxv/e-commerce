@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <base th:href="@{/}">
+    <meta charset="UTF-8">
+    <title>购物车页面</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <script src="js/jquery.min.js"></script>
+    <script type="text/javascript">
+    function deleteCart(obj){
+        if(window.confirm("确认删除吗？")){
+            var pathName = window.document.location.pathname;
+            var projectName = pathName.substring(0,pathName.substring(1).indexOf('/')+1);
+            window.location.href = projectName+"/cart/deleteCart?gid="+obj;
+        }
+    }
+    function clearCart(){
+        if(window.confirm("确认清空吗？")){
+            var pathName = window.document.location.pathname;
+            var projectName = pathName.substring(0,pathName.substring(1).indexOf('/')+1);
+            window.location.href = projectName+"/cart/clearCart";
+        }
+    }
+    </script>
+</head>
+<body>
+    <div th:replace="user/header :: header"></div>
+    <div class="container">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">购物车列表</h3>
+            </div>
+            <div class="panel-body">
+                <div class="table table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="text-center">
+                                <th>商品名称</th>
+                                <th>图片</th>
+                                <th>单价</th>
+                                <th>数量</th>
+                                <th>小计</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="c:${cartlist}">
+                                <td th:text="${c.gname}"></td>
+                                <td><img th:src="'images/'+${c.gpicture}" style="width:50px;height:50px;"/></td>
+                                <td th:text="${c.grprice}"></td>
+                                <td th:text="${c.shoppingnum}"></td>
+                                <td th:text="${c.smallsum}"></td>
+                                <td><a th:href="'javascript:deleteCart('+${c.id}+')'">删除</a></td>
+                            </tr>
+                            <tr>
+                                <td colspan="4" align="right">总计：</td>
+                                <td colspan="2" style="color:red;" th:text="${total}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <a href="javascript:clearCart()" class="btn btn-danger">清空购物车</a>
+                <a th:href="@{cart/selectCart(act=toCount)}" class="btn btn-primary">去结算</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

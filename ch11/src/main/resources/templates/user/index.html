@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <base th:href="@{/}">
+    <meta charset="UTF-8">
+    <title>首页</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css"/>
+    <script src="js/jquery.min.js"></script>
+    <script type="text/javascript" th:inline="javascript">
+    function focus(gid){
+        $.ajax({
+            url: [[@{cart/focus}]],
+            type: "post",
+            contentType: "application/json",
+            data: JSON.stringify({id: gid}),
+            success: function(obj){
+                if(obj == "no"){
+                    alert("已收藏过该商品！");
+                } else {
+                    alert("收藏成功！");
+                }
+            },
+            error: function(){
+                alert("请先登录！");
+            }
+        });
+    }
+    </script>
+</head>
+<body>
+    <div th:replace="user/header :: header"></div>
+    <div class="container">
+        <div>
+            <h4>推荐商品</h4>
+        </div>
+        <div class="row">
+            <div class="col-xs-6 col-md-2" th:each="rGoods:${recommendGoods}">
+                <a th:href="'goodsDetail?id='+${rGoods.id}" class="thumbnail">
+                    <img alt="100%x180" th:src="'images/'+${rGoods.gpicture}" style="height:180px;width:100%;display:block;">
+                </a>
+                <div class="caption" style="text-align: center;">
+                    <span th:text="${rGoods.gname}"></span>
+                </div>
+                <div>
+                    <span style="color:red;">&yen; <span th:text="${rGoods.grprice}"></span></span>
+                    <span class="text-dark" style="text-decoration: line-through;">&yen; <span th:text="${rGoods.goprice}"></span></span>
+                </div>
+                <a th:href="'javascript:focus('+${rGoods.id}+')'" class="btn btn-primary" style="font-size:10px;">加入收藏</a>
+            </div>
+        </div>
+        <!-- ******************************* -->
+        <div> <h4>最新商品</h4> </div>
+        <div class="row">
+            <div class="col-xs-6 col-md-2" th:each="lGoods:${lastedGoods}">
+                <a th:href="'goodsDetail?id='+${lGoods.id}" class="thumbnail">
+                    <img alt="100x180" th:src="'images/'+${lGoods.gpicture}" style="height:180px;width:100%;display:block;">
+                </a>
+                <div class="caption" style="text-align:center;">
+                    <span th:text="${lGoods.gname}"></span>
+                </div>
+                <div>
+                    <span style="color:red;">&yen; <span th:text="${lGoods.grprice}"></span></span>
+                    <span class="text-dark" style="text-decoration:line-through;">&yen; <span th:text="${lGoods.goprice}"></span></span>
+                </div>
+                <a th:href="'javascript:focus('+${lGoods.id}+')'" class="btn btn-primary" style="font-size:10px;">加入收藏</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

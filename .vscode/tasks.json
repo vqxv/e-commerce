@@ -1,0 +1,34 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Start MySQL",
+            "type": "shell",
+            "command": "sudo service mysql start",
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "silent"
+            }
+        },
+        {
+            "label": "Wait for MySQL",
+            "type": "shell",
+            "command": "sleep 2",
+            "dependsOn": "Start MySQL",
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Maven Spring Boot",
+            "type": "shell",
+            "command": "mvn spring-boot:run",
+            "options": {
+                "cwd": "${workspaceFolder}/ch11"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        }
+    ]
+}

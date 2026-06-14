@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <base th:href="@{/}">
+    <meta charset="UTF-8">
+    <title>商品管理</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css"/>
+    <script src="js/jquery.min.js"></script>
+    <script type="text/javascript" th:inline="javascript">
+    function deleteGoods(tid){
+        $.ajax({
+            url: [[@{goods/delete}]],
+            type: "post",
+            data: {id: tid},
+            success: function(obj){
+                if(obj == "no"){
+                    alert("该商品有关联不允许删除！");
+                } else {
+                    if(window.confirm("真的删除该商品吗？")){
+                        var pathName = window.document.location.pathname;
+                        var projectName = pathName.substring(0,pathName.substr(1).indexOf('/')+1);
+                        window.location.href = projectName + obj;
+                    }
+                }
+            },
+            error: function(){
+                alert("处理异常！");
+            }
+        });
+    }
+    </script>
+</head>
+<body>
+    <div th:replace="admin/header :: header"></div>
+    <br><br><br>
+    <div class="container">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">商品列表</h3>
+            </div>
+            <div class="panel-body">
+                <div class="table table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <tbody class="text-center">
+                            <tr>
+                                <th>商品ID</th>
+                                <th>商品名称</th>
+                                <th>商品类型</th>
+                                <th>操作</th>
+                            </tr>
+                            <tr th:each="gds:${allGoods}">
+                                <td th:text="${gds.id}"></td>
+                                <td th:text="${gds.gname}"></td>
+                                <td th:text="${gds.typename}"></td>
+                                <td>
+                                    <a th:href="@{goods/detail(id=${gds.id},act=detail)}" target="blank">详情</a>
+                                    <a th:href="@{goods/detail(id=${gds.id},act=update)}" target="blank">修改</a>
+                                    <a th:href="'javascript:deleteGoods('+${gds.id}+')'">删除</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="4" align="right">
+                                    <ul class="pagination">
+                                        <li><a>第</a> <span th:text="${currentPage}"></span></li>
+                                        <li><a>共</a> <span th:text="${totalPage}"></span></li>
+                                        <a th:href="@{goods/selectAllGoodsByPage(currentPage=${currentPage-1})}">上一页</a>
+                                        <span th:if="${currentPage} != ${totalPage}">
+                                            <a th:href="@{goods/selectAllGoodsByPage(currentPage=${currentPage+1})}">下一页</a>
+                                        </span>
+                                    </ul>
+                                </td>
+                            </tr>
+                            <tr><td colspan="4" align="center"><a th:href="@{goods/toAddGoods}">添加商品</a></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

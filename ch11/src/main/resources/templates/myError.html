@@ -1,0 +1,39 @@
+cat ~/.ssh/id_rsa.pub<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>错误页面</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css"/>
+    <style>
+        .stack-trace {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="panel panel-danger">
+            <div class="panel-heading">
+                <h3 class="panel-title">错误提示</h3>
+            </div>
+            <div class="panel-body">
+                <p th:text="${mymessage}"></p>
+                <div th:if="${stackTrace}" class="stack-trace">
+                    <strong>详细堆栈信息：</strong><br/>
+                    <span th:each="trace : ${stackTrace}" th:text="${trace}"></span>
+                </div>
+                <br/>
+                <a href="javascript:history.back()" class="btn btn-default">返回</a>
+                <a href="/" class="btn btn-primary">返回首页</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

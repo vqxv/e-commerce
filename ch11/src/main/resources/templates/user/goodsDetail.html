@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <base th:href="@{/}">
+    <meta charset="UTF-8">
+    <title>商品详情</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css"/>
+    <script src="js/jquery.min.js"></script>
+    <script type="text/javascript" th:inline="javascript">
+    function focus(gid){
+        $.ajax({
+            url: [[@{cart/focus}]],
+            type: "post",
+            contentType: "application/json",
+            data: JSON.stringify({id: gid}),
+            success: function(obj){
+                if(obj == "no"){
+                    alert("已收藏过该商品！");
+                } else {
+                    alert("收藏成功！");
+                }
+            },
+            error: function(){
+                alert("请先登录！");
+            }
+        });
+    }
+    </script>
+</head>
+<body>
+    <div th:replace="user/header :: header"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <img th:src="'images/'+${goods.gpicture}" style="width:300px;height:300px;"/>
+            </div>
+            <div class="col-md-8">
+                <h3 th:text="${goods.gname}"></h3>
+                <p>类型：<span th:text="${goods.typename}"></span></p>
+                <p>原价：<span style="text-decoration:line-through;">&yen; <span th:text="${goods.goprice}"></span></span></p>
+                <p>现价：<span style="color:red;font-size:20px;">&yen; <span th:text="${goods.grprice}"></span></span></p>
+                <p>库存：<span th:text="${goods.gstore}"></span></p>
+                <form th:action="@{cart/putCart}" method="post">
+                    <input type="hidden" name="id" th:value="${goods.id}"/>
+                    <div class="form-group">
+                        <label>购买数量</label>
+                        <input type="number" name="buyNumber" value="1" min="1" class="form-control" style="width:100px;"/>
+                    </div>
+                    <button type="submit" class="btn btn-primary">加入购物车</button>
+                    <a th:href="'javascript:focus('+${goods.id}+')'" class="btn btn-default">加入收藏</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

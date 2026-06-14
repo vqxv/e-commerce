@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ch.ebusiness.repository.UserAndOrderAndOutRepository">
+    <select id="selectAllOrder" resultType="integer">
+        select count(*) from orderbasetable
+    </select>
+    <select id="selectOrderByPage" resultType="map">
+        select obt.*, bt.bemail from orderbasetable obt, busertable bt where obt.busertable_id = bt.id limit #{startIndex}, #{perPageSize}
+    </select>
+    <select id="selectAllUser" resultType="integer">
+        select count(*) from busertable
+    </select>
+    <select id="selectUserByPage" resultType="map">
+        select * from busertable limit #{startIndex}, #{perPageSize}
+    </select>
+</mapper>

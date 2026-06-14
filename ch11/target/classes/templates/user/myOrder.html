@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <base th:href="@{/}">
+    <meta charset="UTF-8">
+    <title>我的订单</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css"/>
+</head>
+<body>
+    <div th:replace="user/header :: header"></div>
+    <div class="container">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">我的订单</h3>
+            </div>
+            <div class="panel-body">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr class="text-center">
+                            <th>订单ID</th>
+                            <th>金额</th>
+                            <th>状态</th>
+                            <th>下单时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="o:${myOrder}">
+                            <td th:text="${o.id}"></td>
+                            <td th:text="${o.amount}"></td>
+                            <td th:text="${o.status==1}?'已支付':'未支付'"></td>
+                            <td th:text="${o.orderdate}"></td>
+                            <td><a th:href="@{cart/orderDetail(id=${o.id})}">详情</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

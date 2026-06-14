@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <base th:href="@{/}">
+    <meta charset="UTF-8">
+    <title>订单结算</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css"/>
+</head>
+<body>
+    <div th:replace="user/header :: header"></div>
+    <div class="container">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">订单结算</h3>
+            </div>
+            <div class="panel-body">
+                <div class="table table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="text-center">
+                                <th>商品名称</th>
+                                <th>图片</th>
+                                <th>单价</th>
+                                <th>数量</th>
+                                <th>小计</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="c:${cartlist}">
+                                <td th:text="${c.gname}"></td>
+                                <td><img th:src="'images/'+${c.gpicture}" style="width:50px;height:50px;"/></td>
+                                <td th:text="${c.grprice}"></td>
+                                <td th:text="${c.shoppingnum}"></td>
+                                <td th:text="${c.smallsum}"></td>
+                            </tr>
+                            <tr>
+                                <td colspan="4" align="right">总计：</td>
+                                <td style="color:red;" th:text="${total}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <form th:action="@{cart/submitOrder}" method="post">
+                    <input type="hidden" name="amount" th:value="${total}"/>
+                    <button type="submit" class="btn btn-primary">提交订单</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

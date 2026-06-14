@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ch.ebusiness.repository.TypeRepository">
+    <select id="selectAll" resultType="integer">
+        select count(*) from goodstype
+    </select>
+    <select id="selectAllTypeByPage" resultType="GoodsType">
+        select * from goodstype limit #{startIndex}, #{perPageSize}
+    </select>
+    <insert id="addType" parameterType="GoodsType">
+        insert into goodstype (id, typename) values(null, #{typename})
+    </insert>
+    <select id="selectGoods" parameterType="integer" resultType="Goods">
+        select * from goodstable where goodstype_id = #{goodstype_id}
+    </select>
+    <delete id="deleteType" parameterType="integer">
+        delete from goodstype where id=#{id}
+    </delete>
+</mapper>

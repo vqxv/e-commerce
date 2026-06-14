@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<nav th:fragment="header" class="navbar navbar-default" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" th:href="@{goods/selectAllGoodsByPage?currentPage=1&act=select}">后台管理</a>
+            </div>
+            <div class="collapse navbar-collapse">
+                <ul class="nav navbar-nav">
+                    <li><a th:href="@{type/toAddType}">添加类型</a></li>
+                    <li><a th:href="@{type/selectAllTypeByPage?currentPage=1}">类型管理</a></li>
+                    <li><a th:href="@{goods/toAddGoods}">添加商品</a></li>
+                    <li><a th:href="@{goods/selectAllGoodsByPage?currentPage=1&act=select}">商品管理</a></li>
+                    <li><a th:href="@{adminOrder/selectOrder?currentPage=1}">订单管理</a></li>
+                    <li><a th:href="@{adminUser/selectUser?currentPage=1}">用户管理</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a th:href="@{admin/loginOut}">安全退出</a></li>
+                </ul>
+            </div>
+        </div>
+</nav>
+</body>
+</html>

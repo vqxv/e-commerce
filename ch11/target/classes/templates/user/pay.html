@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <base th:href="@{/}">
+    <meta charset="UTF-8">
+    <title>支付页面</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <script src="js/jquery.min.js"></script>
+    <script type="text/javascript" th:inline="javascript">
+    function pay(){
+        $.ajax({
+            url:[[@{/cart/pay}]],
+            type:"post",
+            contentType:"application/json",
+            data:JSON.stringify({
+                id: $("#oid").text()
+            }),
+            success:function(obj) {
+                alert("支付成功");
+                var pathName = window.document.location.pathname;
+                var projectName = pathName.substring(0,pathName.substring(1).indexOf('/')+1);
+                window.location.href = projectName;
+            },
+            error:function(){
+                alert("处理异常!");
+            }
+        });
+    };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">订单提交成功</h3>
+            </div>
+            <div class="panel-body">
+                您的订单编号为<font color="red" size="5"><span id="oid" th:text="${order.id}"></span></font>.<br><br>
+                <a href="javascript:pay()">去支付</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

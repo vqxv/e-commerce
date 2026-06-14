@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ch.ebusiness.repository.CartRepository">
+    <select id="isFocus" resultType="map">
+        select * from focustable where goodstable_id = #{gid} and busertable_id = #{uid}
+    </select>
+    <insert id="focus">
+        insert into focustable (id, goodstable_id, busertable_id, focustime) values(null, #{gid}, #{uid}, now())
+    </insert>
+    <select id="isPutCart" resultType="map">
+        select * from carttable where goodstable_id = #{gid} and busertable_id = #{uid}
+    </select>
+    <insert id="putCart">
+        insert into carttable (id, busertable_id, goodstable_id, shoppingnum) values(null,#{uid},#{gid},#{bnum})
+    </insert>
+    <update id="updateCart">
+        update carttable set shoppingnum = shoppingnum+#{bnum} where busertable_id = #{uid} and goodstable_id = #{gid}
+    </update>
+    <select id="selectCart" parameterType="Integer" resultType="map">
+        select gt.id, gt.gname, gt.gpicture, gt.grprice, ct.shoppingnum, ct.shoppingnum*gt.grprice smallsum
+        from goodstable gt, carttable ct
+        where gt.id=ct.goodstable_id and ct.busertable_id = #{uid}
+    </select>
+    <delete id="deleteAgoods">
+        delete from carttable where busertable_id = #{uid} and goodstable_id = #{gid}
+    </delete>
+    <delete id="clear" parameterType="Integer">
+        delete from carttable where busertable_id = #{uid}
+    </delete>
+    <insert id="addOrder" parameterType="Order" keyProperty="id" useGeneratedKeys="true">
+        insert into orderbasetable (busertable_id, amount, status, orderdate) values(#{buserable_id}, #{amount}, 0, now())
+    </insert>
+    <insert id="addOrderDetail">
+        insert into orderdetail (orderbasetable_id, goodstable_id, shoppingnum)
+        select #{ordersn}, goodstable_id, shoppingnum from carttable where busertable_id = #{uid}
+    </insert>
+    <select id="selectGoodsShop" parameterType="Integer" resultType="map">
+        select shoppingnum gshoppingnum, goodstable_id gid from carttable where busertable_id = #{uid}
+    </select>
+    <update id="updateStore" parameterType="map">
+        update goodstable set gstore = gstore - #{gshoppingnum} where id = #{gid}
+    </update>
+    <update id="pay" parameterType="Integer">
+        update orderbasetable set status = 1 where id = #{ordersn}
+    </update>
+    <select id="myFocus" resultType="map" parameterType="Integer">
+        select gt.id, gt.gname, gt.goprice, gt.grprice, gt.gpicture
+        from FOCUSTABLE ft, GOODSTABLE gt
+        where ft.goodstable_id=gt.id and ft.busertable_id = #{uid}
+    </select>
+    <select id="myOrder" resultType="map" parameterType="Integer">
+        select * from orderbasetable where busertable_id = #{uid}
+    </select>
+    <select id="orderDetail" resultType="map" parameterType="Integer">
+        select od.*, gt.gname, gt.gpicture, gt.grprice from orderdetail od, goodstable gt where od.goodstable_id = gt.id and od.orderbasetable_id = #{id}
+    </select>
+    <update id="updateUpwd">
+        update busertable set bpwd=#{bpwd} where id=#{uid}
+    </update>
+</mapper>

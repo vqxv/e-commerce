@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <base th:href="@{/}">
+    <meta charset="UTF-8">
+    <title>个人信息</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css"/>
+</head>
+<body>
+    <div th:replace="user/header :: header"></div>
+    <div class="container" style="max-width:400px;margin-top:30px;">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">个人信息</h3>
+            </div>
+            <div class="panel-body">
+                <table class="table table-bordered">
+                    <tr><td>用户ID</td><td th:text="${session.bUser?.id}"></td></tr>
+                    <tr><td>邮箱</td><td th:text="${session.bUser?.bemail}"></td></tr>
+                </table>
+                <form th:action="@{cart/updateUpwd}" method="post">
+                    <div class="form-group">
+                        <label>新密码</label>
+                        <input type="password" name="bpwd" class="form-control" placeholder="请输入新密码"/>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">修改密码</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

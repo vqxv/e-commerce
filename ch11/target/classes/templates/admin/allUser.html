@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <base th:href="@{/}">
+    <meta charset="UTF-8">
+    <title>用户管理</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css"/>
+</head>
+<body>
+    <div th:replace="admin/header :: header"></div>
+    <br><br><br>
+    <div class="container">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">用户列表</h3>
+            </div>
+            <div class="panel-body">
+                <div class="table table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <tbody class="text-center">
+                            <tr>
+                                <th>用户ID</th>
+                                <th>邮箱</th>
+                            </tr>
+                            <tr th:each="u:${allUsers}">
+                                <td th:text="${u.id}"></td>
+                                <td th:text="${u.bemail}"></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" align="right">
+                                    <ul class="pagination">
+                                        <li><a>第</a> <span th:text="${currentPage}"></span></li>
+                                        <li><a>共</a> <span th:text="${totalPage}"></span></li>
+                                        <a th:href="@{adminUser/selectUser(currentPage=${currentPage-1})}">上一页</a>
+                                        <span th:if="${currentPage} != ${totalPage}">
+                                            <a th:href="@{adminUser/selectUser(currentPage=${currentPage+1})}">下一页</a>
+                                        </span>
+                                    </ul>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
