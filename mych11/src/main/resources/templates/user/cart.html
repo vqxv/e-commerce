@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>购物车 - E-Shop</title>
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+    <script th:src="@{/js/common.js}"></script>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+    <div class="container mt-5 pt-4">
+        <h2 class="mb-4">我的购物车</h2>
+        <!-- 空购物车 -->
+        <div th:if="${cartItems == null or cartItems.isEmpty()}">
+            <div class="text-center py-5">
+                <i class="bi bi-cart" style="font-size:3rem;color:#ccc;"></i>
+                <h4 class="mt-3">购物车空空如也</h4>
+                <p>去 <a th:href="@{/}" class="btn btn-primary btn-sm">首页</a> 逛逛吧！</p>
+            </div>
+        </div>
+        <!-- 购物车列表 -->
+        <div th:if="${not #lists.isEmpty(cartItems)}">
+            <div class="table-responsive">
+                <table class="table align-middle table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>商品</th>
+                            <th>单价</th>
+                            <th>数量</th>
+                            <th>小计</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="item : ${cartItems}">
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <img th:src="@{/images/{img}(img=${item.goods.picture})}" class="rounded" style="width:80px; height:80px; object-fit:cover;">
+                                    <a th:href="@{/goodsDetail(id=${item.goods.id})}" th:text="${item.goods.name}" class="text-decoration-none fw-medium"></a>
+                                </div>
+                            </td>
+                            <td class="text-danger fw-bold">¥<span th:text="${item.goods.currentPrice}"></span></td>
+                            <td th:text="${item.quantity}"></td>
+                            <td class="text-danger fw-bold">¥<span th:text="${item.goods.currentPrice * item.quantity}"></span></td>
+                            <td>
+                                <button class="btn btn-outline-danger btn-sm" th:onclick="'deleteCartItem('+${item.id}+')'">删除</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex justify-content-between align-items-center bg-white p-3 rounded-3 shadow-sm mt-3">
+                <button class="btn btn-outline-warning" onclick="clearCart()">清空购物车</button>
+                <h4 class="mb-0">总计：<span class="text-danger">¥<span th:text="${total}"></span></span></h4>
+                <button class="btn btn-success btn-lg" onclick="submitOrder()">提交订单</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

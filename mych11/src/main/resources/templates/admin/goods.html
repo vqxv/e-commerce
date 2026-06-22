@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>商品管理 - 管理后台</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .carousel { display: none !important; }
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+<div class="container mt-5 pt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>商品列表</h2>
+        <button class="btn btn-primary" onclick="openAddModal()">添加商品</button>
+    </div>
+    <table class="table table-hover">
+        <thead class="table-light">
+        <tr>
+            <th>ID</th><th>图片</th><th>名称</th><th>原价</th><th>现价</th><th>库存</th><th>推荐</th><th>广告</th><th>操作</th>
+        </tr>
+        </thead>
+        <tbody id="goodsTableBody"></tbody>
+    </table>
+    <nav id="goodsPagination" class="d-flex justify-content-center"></nav>
+</div>
+
+<!-- 编辑模态框 -->
+<div class="modal fade" id="goodsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">添加商品</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="goodsForm" enctype="multipart/form-data">
+                    <input type="hidden" id="goodsId">
+                    <div class="mb-3">
+                        <label class="form-label">名称</label>
+                        <input type="text" class="form-control" id="goodsName" required>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label class="form-label">原价</label>
+                            <input type="number" step="0.01" class="form-control" id="originalPrice" required>
+                        </div>
+                        <div class="col">
+                            <label class="form-label">现价</label>
+                            <input type="number" step="0.01" class="form-control" id="currentPrice" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">库存</label>
+                        <input type="number" class="form-control" id="goodsStock" required>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label class="form-label">商品类型</label>
+                            <select class="form-select" id="goodsType"></select>
+                        </div>
+                        <div class="col">
+                            <div class="form-check mt-4">
+                                <input class="form-check-input" type="checkbox" id="isRecommend">
+                                <label class="form-check-label">推荐</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="isAd">
+                                <label class="form-check-label">广告</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">商品图片</label>
+                        <input type="file" class="form-control" id="goodsImageFile">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">保存</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const modal = new bootstrap.Modal('#goodsModal');
+    let currentPage = 0;
+
+    function loadGoods(page = 0) {
+        currentPage = page;
+        fetch(`/admin/goods/list?page=${page}&size=5`)
+            .then(r => r.json())
+            .then(data => {
+                const tbody = document.getElementById('goodsTableBody');
+                tbody.innerHTML = '';
+                data.content.forEach(g => {
+                    const safeG = JSON.stringify(g).replace(/'/g, "&#39;");
+                    tbody.innerHTML += `<tr>
+                        <td>${g.id}</td>
+                        <td><img src="/images/${g.picture || 'default.jpg'}" width="50" class="img-thumbnail"></td>
+                        <td>${g.name}</td>
+                        <td>¥${g.originalPrice}</td>
+                        <td class="text-danger fw-bold">¥${g.currentPrice}</td>
+                        <td>${g.stock}</td>
+                        <td>${g.isRecommend ? '是' : '否'}</td>
+                        <td>${g.isAdvertisement ? '是' : '否'}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" onclick='editGoods(${safeG})'>编辑</button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteGoods(${g.id})">删除</button>
+                        </td>
+                    </tr>`;
+                });
+                renderPagination(data);
+            });
+    }
+
+    function renderPagination(page) {
+        const nav = document.getElementById('goodsPagination');
+        nav.innerHTML = '';
+        if (page.totalPages <= 1) return;
+        for (let i = 0; i < page.totalPages; i++) {
+            nav.innerHTML += `<button class="btn btn-sm ${i === currentPage ? 'btn-primary' : 'btn-outline-primary'} mx-1" onclick="loadGoods(${i})">${i+1}</button>`;
+        }
+    }
+
+    function openAddModal() {
+        document.getElementById('goodsForm').reset();
+        document.getElementById('goodsId').value = '';
+        document.getElementById('modalTitle').textContent = '添加商品';
+        loadTypeOptions();
+        modal.show();
+    }
+
+    function editGoods(g) {
+        document.getElementById('goodsId').value = g.id;
+        document.getElementById('goodsName').value = g.name;
+        document.getElementById('originalPrice').value = g.originalPrice;
+        document.getElementById('currentPrice').value = g.currentPrice;
+        document.getElementById('goodsStock').value = g.stock;
+        document.getElementById('isRecommend').checked = g.isRecommend === 1;
+        document.getElementById('isAd').checked = g.isAdvertisement === 1;
+        document.getElementById('modalTitle').textContent = '编辑商品';
+        loadTypeOptions(g.goodsType ? g.goodsType.id : null);
+        modal.show();
+    }
+
+    function loadTypeOptions(selectedId) {
+        fetch('/admin/types/list')
+            .then(r => r.json())
+            .then(types => {
+                const sel = document.getElementById('goodsType');
+                sel.innerHTML = types.map(t => `<option value="${t.id}" ${t.id === selectedId ? 'selected' : ''}>${t.typename}</option>`).join('');
+            });
+    }
+
+    document.getElementById('goodsForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const id = document.getElementById('goodsId').value;
+        const formData = new FormData();
+        formData.append('id', id);
+        formData.append('name', document.getElementById('goodsName').value);
+        formData.append('originalPrice', document.getElementById('originalPrice').value);
+        formData.append('currentPrice', document.getElementById('currentPrice').value);
+        formData.append('stock', document.getElementById('goodsStock').value);
+        formData.append('isRecommend', document.getElementById('isRecommend').checked ? 1 : 0);
+        formData.append('isAdvertisement', document.getElementById('isAd').checked ? 1 : 0);
+        formData.append('goodsType.id', document.getElementById('goodsType').value);
+        const fileInput = document.getElementById('goodsImageFile');
+        if (fileInput.files.length > 0) formData.append('file', fileInput.files[0]);
+
+        const url = id ? '/admin/goods/update' : '/admin/goods/add';
+        fetch(url, { method: 'POST', body: formData })
+            .then(r => r.json())
+            .then(res => {
+                if (res.message) {
+                    alert(res.message);
+                    modal.hide();
+                    loadGoods(currentPage);
+                } else {
+                    alert(res.error || '操作失败');
+                }
+            });
+    });
+
+    function deleteGoods(id) {
+        if (!confirm('确定删除此商品？')) return;
+        fetch(`/admin/goods/delete/${id}`, { method: 'POST' })
+            .then(r => r.json())
+            .then(res => {
+                if (res.result === 'ok') {
+                    loadGoods(currentPage);
+                } else {
+                    alert('删除失败，商品可能有关联数据');
+                }
+            });
+    }
+
+    loadGoods();
+</script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>类型管理 - 管理后台</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .carousel { display: none !important; }
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+<div class="container mt-5 pt-4">
+    <h2>商品类型</h2>
+    <div class="input-group my-3" style="max-width:400px;">
+        <input type="text" id="typeNameInput" class="form-control" placeholder="新类型名称">
+        <button class="btn btn-primary" onclick="addType()">添加</button>
+    </div>
+    <table class="table table-hover">
+        <thead><tr><th>ID</th><th>名称</th><th>操作</th></tr></thead>
+        <tbody id="typeTableBody"></tbody>
+    </table>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function loadTypes() {
+        fetch('/admin/types/list')
+            .then(r => r.json())
+            .then(types => {
+                document.getElementById('typeTableBody').innerHTML = types.map(t => `<tr>
+                    <td>${t.id}</td><td>${t.typename}</td>
+                    <td><button class="btn btn-sm btn-outline-danger" onclick="deleteType(${t.id})">删除</button></td>
+                </tr>`).join('');
+            });
+    }
+
+    function addType() {
+        const name = document.getElementById('typeNameInput').value.trim();
+        if (!name) return alert('请输入类型名称');
+        fetch('/admin/types/add', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: 'name=' + encodeURIComponent(name)
+        }).then(r => r.json()).then(res => {
+            if (res.message) {
+                document.getElementById('typeNameInput').value = '';
+                loadTypes();
+            } else {
+                alert(res.error);
+            }
+        });
+    }
+
+    function deleteType(id) {
+        if (!confirm('确定删除该类型？')) return;
+        fetch(`/admin/types/delete/${id}`, { method: 'POST' })
+            .then(r => r.json())
+            .then(res => {
+                if (res.result === 'ok') {
+                    loadTypes();
+                } else {
+                    alert('删除失败，类型下有商品');
+                }
+            });
+    }
+
+    loadTypes();
+</script>
+</body>
+</html>
