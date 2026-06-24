@@ -1,6 +1,6 @@
 -- eBusiness 电子商务系统数据库初始化脚本
-CREATE DATABASE IF NOT EXISTS shop CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-USE shop;
+CREATE DATABASE IF NOT EXISTS ebusiness CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE ebusiness;
 
 -- 管理员表
 CREATE TABLE IF NOT EXISTS austertable (

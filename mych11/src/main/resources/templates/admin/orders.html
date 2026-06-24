@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>订单管理 - 管理后台</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <th:block th:replace="~{admin/layout :: admin-css}"></th:block>
+</head>
+<body>
+<div class="admin-app">
+    <div class="admin-sidebar">
+        <div class="brand">管理后台</div>
+        <nav class="nav-menu">
+            <a class="nav-link" th:href="@{/admin/dashboard}"><i>&#128202;</i>仪表盘</a>
+            <a class="nav-link" th:href="@{/admin/goods}"><i>&#128230;</i>商品管理</a>
+            <a class="nav-link" th:href="@{/admin/types}"><i>&#127991;</i>分类管理</a>
+            <a class="nav-link active" th:href="@{/admin/orders}"><i>&#128203;</i>订单管理</a>
+            <a class="nav-link" th:href="@{/admin/users}"><i>&#128101;</i>用户管理</a>
+            <hr style="border-color: rgba(255,255,255,0.1); margin: 5px 15px;">
+            <a class="nav-link" href="/"><i>&#127968;</i>返回首页</a>
+        </nav>
+    </div>
+    <div class="admin-main">
+        <div class="admin-topbar">
+            <h4 class="mb-0">订单管理</h4>
+            <div class="user-info">
+                <span sec:authorize="isAuthenticated()" class="text-muted me-3" th:text="${#authentication.name}"></span>
+                <a th:href="@{/user/logout}" class="btn-admin btn-sm">退出</a>
+            </div>
+        </div>
+        <div class="admin-content">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0">订单列表</h5>
+            </div>
+            <div class="table-custom">
+                <table class="table table-hover mb-0">
+                    <thead><tr><th>ID</th><th>用户</th><th>金额</th><th>状态</th><th>时间</th></tr></thead>
+                    <tbody id="orderTableBody"></tbody>
+                </table>
+            </div>
+            <!-- 分页控件 -->
+            <div class="d-flex justify-content-center align-items-center mt-3 gap-2">
+                <button class="btn btn-sm btn-outline-secondary" id="prevPageBtn" onclick="changePage(currentPage - 1)">上一页</button>
+                <span id="pageInfo" class="text-muted">第 1 页</span>
+                <button class="btn btn-sm btn-outline-secondary" id="nextPageBtn" onclick="changePage(currentPage + 1)">下一页</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+let currentPage = 0;
+let totalElements = 0;
+let totalPages = 0;
+
+function getStatusText(status) {
+    const map = { 0: '待付款', 1: '已付款', 2: '已发货', 3: '已完成', -1: '已取消' };
+    return map[status] || '未知';
+}
+
+function loadOrders(page) {
+    currentPage = page || 0;
+    fetch('/admin/orders/list')
+        .then(r => r.json())
+        .then(function(data) {
+            totalElements = data.length;
+            totalPages = Math.ceil(totalElements / 10) || 1;
+            currentPage = Math.min(currentPage, totalPages - 1);
+            var start = currentPage * 10;
+            var end = Math.min(start + 10, totalElements);
+            var pageData = data.slice(start, end);
+            
+            var tbody = document.getElementById('orderTableBody');
+            tbody.innerHTML = '';
+            pageData.forEach(function(o) {
+                tbody.innerHTML += '<tr>' +
+                    '<td>' + o.id + '</td>' +
+                    '<td>' + (o.user ? o.user.email : '-') + '</td>' +
+                    '<td>¥' + (o.totalAmount || 0) + '</td>' +
+                    '<td>' + getStatusText(o.status) + '</td>' +
+                    '<td>' + (o.createTime ? o.createTime.replace('T', ' ') : '-') + '</td>' +
+                    '</tr>';
+            });
+            updatePagination();
+        })
+        .catch(e => {
+            console.error('加载订单失败:', e);
+            document.getElementById('orderTableBody').innerHTML = '<tr><td colspan="5" class="text-center text-muted">暂无订单数据</td></tr>';
+        });
+}
+
+function updatePagination() {
+    var pageNum = currentPage + 1;
+    document.getElementById('pageInfo').textContent = '共 ' + totalElements + ' 条，第 ' + pageNum + '/' + totalPages + ' 页';
+    document.getElementById('prevPageBtn').disabled = (currentPage <= 0);
+    document.getElementById('nextPageBtn').disabled = (currentPage >= totalPages - 1);
+}
+
+function changePage(newPage) {
+    if (newPage < 0 || newPage >= totalPages) return;
+    loadOrders(newPage);
+}
+
+loadOrders();
+</script>
+</body>
+</html>

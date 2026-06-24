@@ -27,6 +27,9 @@ public class Goods {
     @Column(name = "gpicture", length = 255)
     private String picture;
 
+    @Column(length = 1000)
+    private String description;
+
     @Column(name = "is_recommend")
     private Integer isRecommend = 0;
 

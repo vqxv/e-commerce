@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>我的订单 - E-Shop</title>
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+    <script th:src="@{/js/common.js}"></script>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+    <div class="container mt-5 pt-4">
+        <h2 class="mb-4">我的订单</h2>
+        <div th:if="${orders == null or orders.isEmpty()}" class="text-center py-5">
+            <div class="alert alert-info fs-5">
+                📦 你还没有任何订单，去 <a th:href="@{/}" class="alert-link">购物</a> 吧！
+            </div>
+        </div>
+        <div th:if="${not #lists.isEmpty(orders)}">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>订单编号</th>
+                            <th>金额</th>
+                            <th>状态</th>
+                            <th>时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="order : ${orders}">
+                            <td th:text="${order.id}"></td>
+                            <td class="text-danger fw-bold">¥<span th:text="${order.totalAmount}"></span></td>
+                            <td>
+                                <span th:if="${order.status == 0}" class="badge bg-warning text-dark">待支付</span>
+                                <span th:if="${order.status == 1}" class="badge bg-success">已支付</span>
+                            </td>
+                            <td th:text="${#temporals.format(order.createTime, 'yyyy-MM-dd HH:mm')}"></td>
+                            <td>
+                                <a th:href="@{/cart/orderDetail/{id}(id=${order.id})}" class="btn btn-outline-secondary btn-sm">详情</a>
+                                <button th:if="${order.status == 0}" class="btn btn-outline-success btn-sm ms-1" th:onclick="'payOrder('+${order.id}+')'">支付</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

@@ -18,6 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.io.IOException;
 
@@ -47,13 +48,30 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationSuccessHandler authenticationSuccessHandler() {
+    public AuthenticationSuccessHandler adminAuthSuccessHandler() {
         return new AuthenticationSuccessHandler() {
             @Override
             public void onAuthenticationSuccess(HttpServletRequest request,
                                                 HttpServletResponse response,
                                                 Authentication authentication) throws IOException, ServletException {
-                if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
+                response.sendRedirect("/admin/dashboard");
+            }
+        };
+    }
+
+    @Bean
+    public AuthenticationSuccessHandler userAuthSuccessHandler() {
+        return new AuthenticationSuccessHandler() {
+            @Override
+            public void onAuthenticationSuccess(HttpServletRequest request,
+                                                HttpServletResponse response,
+                                                Authentication authentication) throws IOException, ServletException {
+                String role = authentication.getAuthorities().stream()
+                    .map(a -> a.getAuthority())
+                    .filter(a -> a.startsWith("ROLE_"))
+                    .map(a -> a.substring(5))
+                    .findFirst().orElse("USER");
+                if ("ADMIN".equals(role)) {
                     response.sendRedirect("/admin/dashboard");
                 } else {
                     response.sendRedirect("/");
@@ -63,32 +81,52 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http,
-                                           AuthenticationSuccessHandler successHandler) throws Exception {
+    public SecurityFilterChain adminFilterChain(HttpSecurity http, @Qualifier("adminAuthSuccessHandler") AuthenticationSuccessHandler adminSuccessHandler) throws Exception {
         http
+            .securityMatcher("/admin/**")
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
-                .requestMatchers("/validateCode").permitAll()
-                .requestMatchers("/user/**").permitAll()
-                .requestMatchers("/goodsDetail", "/search").permitAll()
                 .requestMatchers("/admin/toLogin", "/admin/login").permitAll()
-                .requestMatchers("/cart/**").hasRole("USER")
                 .requestMatchers("/admin/**").hasRole("ADMIN")
-                .anyRequest().authenticated()
             )
             .formLogin(form -> form
                 .loginPage("/admin/toLogin")
                 .loginProcessingUrl("/admin/login")
                 .usernameParameter("email")
-                .successHandler(successHandler)
+                .successHandler(adminSuccessHandler)
                 .failureUrl("/admin/toLogin?error")
                 .permitAll()
             )
-            .rememberMe(remember -> remember.key("uniqueAndSecret"))
+            .logout(logout -> logout
+                .logoutUrl("/admin/logout")
+                .logoutSuccessUrl("/admin/toLogin")
+                .permitAll()
+            )
+            .csrf(csrf -> csrf.disable());
+        return http.build();
+    }
+
+    @Bean
+    public SecurityFilterChain userFilterChain(HttpSecurity http, @Qualifier("userAuthSuccessHandler") AuthenticationSuccessHandler userSuccessHandler) throws Exception {
+        http
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/css/**", "/js/**", "/images/**", "/validateCode").permitAll()
+                .requestMatchers("/", "/index", "/goodsDetail", "/search").permitAll()
+                .requestMatchers("/user/**").permitAll()
+                .requestMatchers("/cart/add", "/cart/focus", "/cart/delete/**", "/cart/clear", "/cart/submitOrder", "/cart/pay/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/cart/view", "/cart/myFocus", "/cart/myOrders", "/cart/orderDetail/**").hasAnyRole("USER", "ADMIN")
+                .anyRequest().authenticated()
+            )
+            .formLogin(form -> form
+                .loginPage("/user/toLogin")
+                .loginProcessingUrl("/user/login")
+                .usernameParameter("email")
+                .successHandler(userSuccessHandler)
+                .failureUrl("/user/toLogin?error")
+                .permitAll()
+            )
             .logout(logout -> logout
                 .logoutUrl("/user/logout")
                 .logoutSuccessUrl("/")
-                .deleteCookies("JSESSIONID")
                 .permitAll()
             )
             .csrf(csrf -> csrf.disable());

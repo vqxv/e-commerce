@@ -1,5 +1,6 @@
 package com.ch.ebusiness.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
@@ -10,6 +11,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 @Data
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "orders", "cartItems", "focusList"})
 @Entity
 @Table(name = "users")
 public class User implements UserDetails {

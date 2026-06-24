@@ -20,7 +20,6 @@ import java.util.*;
 
 @Controller
 @RequestMapping("/admin")
-@PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
 
     private final GoodsRepository goodsRepository;
@@ -42,7 +41,6 @@ public class AdminController {
     }
 
     @GetMapping("/toLogin")
-    @PreAuthorize("permitAll()")
     public String loginPage() {
         return "admin/login";
     }
@@ -171,23 +169,29 @@ public class AdminController {
     }
 
     @GetMapping("/orders")
+    @PreAuthorize("hasRole('ADMIN')")
     public String ordersPage() {
-        return "admin/ordersUsers";
+        return "admin/orders";
     }
 
     @GetMapping("/orders/list")
+    @PreAuthorize("hasRole('ADMIN')")
     @ResponseBody
+    @Transactional(readOnly = true)
     public List<Order> ordersList() {
         return orderRepository.findAll(Sort.by(Sort.Direction.DESC, "createTime"));
     }
 
     @GetMapping("/users")
+    @PreAuthorize("hasRole('ADMIN')")
     public String usersPage() {
-        return "admin/ordersUsers";
+        return "admin/users";
     }
 
     @GetMapping("/users/list")
+    @PreAuthorize("hasRole('ADMIN')")
     @ResponseBody
+    @Transactional(readOnly = true)
     public List<User> usersList() {
         return userRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
     }

@@ -44,6 +44,7 @@ public class CartController {
      */
     @PostMapping("/focus")
     @ResponseBody
+    @Transactional
     public String focus(@RequestParam Integer goodsId) {
         User user = getCurrentUser();
         if (focusRepository.existsByUserAndGoodsId(user, goodsId)) {

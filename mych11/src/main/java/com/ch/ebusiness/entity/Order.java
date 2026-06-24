@@ -1,5 +1,7 @@
 package com.ch.ebusiness.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
@@ -7,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
 @Table(name = "orderbasetable")
 public class Order {
