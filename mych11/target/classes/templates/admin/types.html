@@ -40,19 +40,71 @@
                     <tbody id="typeTableBody"></tbody>
                 </table>
             </div>
+            <!-- 分页控件 -->
+            <div class="d-flex justify-content-center align-items-center mt-3 gap-2">
+                <button class="btn btn-sm btn-outline-secondary" id="prevPageBtn" onclick="changePage(currentPage - 1)">上一页</button>
+                <span id="pageInfo" class="text-muted">第 1 页</span>
+                <button class="btn btn-sm btn-outline-secondary" id="nextPageBtn" onclick="changePage(currentPage + 1)">下一页</button>
+                <div class="input-group" style="width: 150px;">
+                    <input type="number" class="form-control form-control-sm" id="gotoPageInput" placeholder="页码" min="1" style="border-radius:20px 0 0 20px;">
+                    <button class="btn btn-sm btn-admin" onclick="gotoPage()" style="border-radius:0 20px 20px 0;">跳转</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+let allTypes = [];
+const PAGE_SIZE = 10;
+let currentPage = 0;
+
 function loadTypes() {
     fetch('/admin/types/list').then(r => r.json()).then(function(types) {
-        document.getElementById('typeTableBody').innerHTML = types.map(function(t) {
+        allTypes = types;
+        currentPage = 0;
+        renderPage();
+    });
+}
+
+function renderPage() {
+    var start = currentPage * PAGE_SIZE;
+    var end = Math.min(start + PAGE_SIZE, allTypes.length);
+    var pageTypes = allTypes.slice(start, end);
+    var tbody = document.getElementById('typeTableBody');
+    if (pageTypes.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">暂无分类数据</td></tr>';
+    } else {
+        tbody.innerHTML = pageTypes.map(function(t) {
             return '<tr><td>' + t.id + '</td><td>' + t.typename + '</td>' +
                 '<td><button class="btn btn-sm btn-danger" onclick="deleteType(' + t.id + ')">删除</button></td></tr>';
         }).join('');
-    });
+    }
+    var totalPages = Math.ceil(allTypes.length / PAGE_SIZE) || 1;
+    document.getElementById('pageInfo').textContent = '共 ' + allTypes.length + ' 条，第 ' + (currentPage + 1) + '/' + totalPages + ' 页';
+    document.getElementById('prevPageBtn').disabled = (currentPage <= 0);
+    document.getElementById('nextPageBtn').disabled = (currentPage >= totalPages - 1);
+    document.getElementById('gotoPageInput').max = totalPages;
 }
+
+function changePage(newPage) {
+    var totalPages = Math.ceil(allTypes.length / PAGE_SIZE) || 1;
+    if (newPage < 0 || newPage >= totalPages) return;
+    currentPage = newPage;
+    renderPage();
+}
+
+function gotoPage() {
+    var input = document.getElementById('gotoPageInput');
+    var pageNum = parseInt(input.value) - 1;
+    var totalPages = Math.ceil(allTypes.length / PAGE_SIZE) || 1;
+    if (pageNum >= 0 && pageNum < totalPages) {
+        currentPage = pageNum;
+        renderPage();
+        input.value = '';
+    }
+}
+
 function addType() {
     var name = document.getElementById('typeNameInput').value.trim();
     if (!name) return alert('请输入类型名称');
@@ -62,6 +114,7 @@ function addType() {
             else { alert(res.error || '操作失败'); }
         });
 }
+
 function deleteType(id) {
     if (!confirm('确定删除该类型？')) return;
     fetch('/admin/types/delete/' + id, { method: 'POST' }).then(r => r.json()).then(function(res) {
@@ -69,6 +122,7 @@ function deleteType(id) {
         else alert('删除失败，类型下有商品');
     });
 }
+
 loadTypes();
 </script>
 </body>

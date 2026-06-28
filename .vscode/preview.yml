@@ -2,8 +2,8 @@
 autoOpen: true
 apps:
   - port: 8080
-    run: cd ch11 && service mysql start 2>/dev/null; sleep 1; mvn spring-boot:run
-    root: ch11
+    run: docker start ecommerce-mysql 2>/dev/null || docker run -d --name ecommerce-mysql -e MYSQL_ROOT_PASSWORD=123456 -e MYSQL_DATABASE=ebusiness -p 3306:3306 mysql:8.0; sleep 3; cd /workspace/mych11 && mvn spring-boot:run
+    root: mych11
     name: eBusiness
     description: Spring Boot + MyBatis + Thymeleaf 电子商务系统
     autoOpen: true

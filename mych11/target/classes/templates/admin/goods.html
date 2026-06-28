@@ -30,9 +30,10 @@
             </div>
         </div>
         <div class="admin-content">
+            <!-- 添加商品按钮触发模态框 -->
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="mb-0">商品列表</h5>
-                <button class="btn btn-admin" onclick="openAddModal()">添加商品</button>
+                <button class="btn btn-admin" data-bs-toggle="modal" data-bs-target="#addGoodsModal">+ 添加商品</button>
             </div>
             <div class="table-custom">
                 <table class="table table-hover mb-0">
@@ -54,70 +55,65 @@
     </div>
 </div>
 
-<div class="modal fade" id="goodsModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header" style="background: linear-gradient(135deg, #667eea, #764ba2); color: #fff;">
-                <h5 class="modal-title" id="modalTitle">添加商品</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="goodsForm" enctype="multipart/form-data">
-                    <input type="hidden" id="goodsId">
-                    <div class="mb-3"><label class="form-label">名称</label><input type="text" class="form-control" id="goodsName" required></div>
-                    <div class="row mb-3">
-                        <div class="col"><label class="form-label">原价</label><input type="number" step="0.01" class="form-control" id="originalPrice" required></div>
-                        <div class="col"><label class="form-label">现价</label><input type="number" step="0.01" class="form-control" id="currentPrice" required></div>
-                    </div>
-                    <div class="mb-3"><label class="form-label">库存</label><input type="number" class="form-control" id="goodsStock" required></div>
-                    <div class="row mb-3">
-                        <div class="col"><label class="form-label">商品类型</label><select class="form-select" id="goodsType"></select></div>
-                        <div class="col">
-                            <div class="form-check mt-2"><input class="form-check-input" type="checkbox" id="isRecommend"><label class="form-check-label">推荐</label></div>
-                            <div class="form-check mt-2"><input class="form-check-input" type="checkbox" id="isAd"><label class="form-check-label">广告</label></div>
-                        </div>
-                    </div>
-                    <div class="mb-3"><label class="form-label">商品图片</label><input type="file" class="form-control" id="goodsImageFile"></div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-admin" onclick="saveGoods()">保存</button>
-            </div>
-        </div>
+<!-- 添加商品模态框 -->
+<div class="modal fade" id="addGoodsModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">添加商品</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <form id="addGoodsForm" enctype="multipart/form-data">
+            <div class="mb-3"><label>名称</label><input type="text" name="name" class="form-control" required></div>
+            <div class="row mb-3"><div class="col"><label>原价</label><input type="number" step="0.01" name="originalPrice" class="form-control" required></div><div class="col"><label>现价</label><input type="number" step="0.01" name="currentPrice" class="form-control" required></div></div>
+            <div class="mb-3"><label>库存</label><input type="number" name="stock" class="form-control" required></div>
+            <div class="row mb-3"><div class="col"><div class="form-check"><input class="form-check-input" type="checkbox" name="isRecommend" value="1"><label class="form-check-label">推荐</label></div></div><div class="col"><div class="form-check"><input class="form-check-input" type="checkbox" name="isAdvertisement" value="1"><label class="form-check-label">广告</label></div></div></div>
+            <div class="mb-3"><label>类型</label><select name="goodsType.id" class="form-control" id="typeSelect"></select></div>
+            <div class="mb-3"><label>图片</label><input type="file" name="file" class="form-control" required></div>
+        </form>
+      </div>
+      <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">取消</button><button class="btn btn-admin" onclick="addGoods()">确认添加</button></div>
     </div>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-const modal = new bootstrap.Modal('#goodsModal');
 let currentPage = 0;
 let totalElements = 0;
 let totalPages = 0;
+const PAGE_SIZE = 10;
 
 function loadGoods(page) {
     currentPage = page || 0;
-    fetch('/admin/goods/list?page=' + currentPage + '&size=5')
-        .then(r => r.json())
+    fetch('/admin/goods/list?page=' + currentPage + '&size=' + PAGE_SIZE)
+        .then(function(r) { return r.json(); })
         .then(function(data) {
             totalElements = data.totalElements || 0;
             totalPages = data.totalPages || 1;
             var tbody = document.getElementById('goodsTableBody');
             tbody.innerHTML = '';
-            (data.content || []).forEach(function(g) {
-                tbody.innerHTML += '<tr>' +
-                    '<td>' + g.id + '</td>' +
-                    '<td><img src="/images/' + (g.picture || 'default.jpg') + '" width="50" class="img-thumbnail"></td>' +
-                    '<td>' + g.name + '</td>' +
-                    '<td>¥' + g.originalPrice + '</td>' +
-                    '<td class="text-danger fw-bold">¥' + g.currentPrice + '</td>' +
-                    '<td>' + g.stock + '</td>' +
-                    '<td>' + (g.isRecommend ? '是' : '否') + '</td>' +
-                    '<td>' + (g.isAdvertisement ? '是' : '否') + '</td>' +
-                    '<td><button class="btn btn-sm btn-primary" onclick="editGoods(' + JSON.stringify(g).replace(/'/g, "&#39;") + ')">编辑</button> ' +
-                    '<button class="btn btn-sm btn-danger" onclick="deleteGoods(' + g.id + ')">删除</button></td></tr>';
-            });
+            var items = data.content || [];
+            if (items.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">暂无商品数据</td></tr>';
+            } else {
+                items.forEach(function(g) {
+                    var imgUrl = g.picture ? '/images/' + g.picture : '/images/book1.jpg';
+                    tbody.innerHTML += '<tr>' +
+                        '<td>' + g.id + '</td>' +
+                        '<td><img src="' + imgUrl + '" style="width:50px;height:50px;object-fit:cover;border-radius:5px;"></td>' +
+                        '<td>' + (g.name || '-') + '</td>' +
+                        '<td>' + (g.originalPrice || 0) + '</td>' +
+                        '<td>' + (g.currentPrice || 0) + '</td>' +
+                        '<td>' + (g.stock || 0) + '</td>' +
+                        '<td>' + (g.isRecommend ? '是' : '否') + '</td>' +
+                        '<td>' + (g.isAdvertisement ? '是' : '否') + '</td>' +
+                        '<td><button class="btn btn-sm btn-danger" onclick="deleteGoods(' + g.id + ')">删除</button></td></tr>';
+                });
+            }
             updatePagination();
+        })
+        .catch(function(e) {
+            console.error('加载商品失败:', e);
+            document.getElementById('goodsTableBody').innerHTML = '<tr><td colspan="9" class="text-center text-muted">暂无商品数据</td></tr>';
         });
 }
 
@@ -143,64 +139,37 @@ function gotoPage() {
     }
 }
 
-function openAddModal() {
-    document.getElementById('goodsForm').reset();
-    document.getElementById('goodsId').value = '';
-    document.getElementById('modalTitle').textContent = '添加商品';
-    loadTypeOptions();
-    modal.show();
-}
-
-function editGoods(g) {
-    document.getElementById('goodsId').value = g.id;
-    document.getElementById('goodsName').value = g.name;
-    document.getElementById('originalPrice').value = g.originalPrice;
-    document.getElementById('currentPrice').value = g.currentPrice;
-    document.getElementById('goodsStock').value = g.stock;
-    document.getElementById('isRecommend').checked = g.isRecommend === 1;
-    document.getElementById('isAd').checked = g.isAdvertisement === 1;
-    document.getElementById('modalTitle').textContent = '编辑商品';
-    loadTypeOptions(g.goodsType ? g.goodsType.id : null);
-    modal.show();
-}
-
-function loadTypeOptions(selectedId) {
+function loadTypesForSelect() {
     fetch('/admin/types/list').then(r => r.json()).then(function(types) {
-        var sel = document.getElementById('goodsType');
-        sel.innerHTML = types.map(function(t) {
-            return '<option value="' + t.id + '"' + (t.id === selectedId ? ' selected' : '') + '>' + t.typename + '</option>';
-        }).join('');
+        var sel = document.getElementById('typeSelect');
+        sel.innerHTML = '';
+        types.forEach(function(t) { sel.innerHTML += '<option value="' + t.id + '">' + t.typename + '</option>'; });
     });
 }
 
-function saveGoods() {
-    var id = document.getElementById('goodsId').value;
-    var fd = new FormData();
-    if (id) fd.append('id', id);
-    fd.append('name', document.getElementById('goodsName').value);
-    fd.append('originalPrice', document.getElementById('originalPrice').value);
-    fd.append('currentPrice', document.getElementById('currentPrice').value);
-    fd.append('stock', document.getElementById('goodsStock').value);
-    fd.append('isRecommend', document.getElementById('isRecommend').checked ? 1 : 0);
-    fd.append('isAdvertisement', document.getElementById('isAd').checked ? 1 : 0);
-    fd.append('goodsType.id', document.getElementById('goodsType').value);
-    var fi = document.getElementById('goodsImageFile');
-    if (fi.files.length > 0) fd.append('file', fi.files[0]);
-    var url = id ? '/admin/goods/update' : '/admin/goods/add';
-    fetch(url, { method: 'POST', body: fd }).then(r => r.json()).then(function(res) {
-        if (res.message) { alert(res.message); modal.hide(); loadGoods(currentPage); }
-        else { alert(res.error || '操作失败'); }
-    });
+function addGoods() {
+    var form = document.getElementById('addGoodsForm');
+    var fd = new FormData(form);
+    fetch('/admin/goods/add', { method: 'POST', body: fd })
+        .then(r => r.json()).then(function(res) {
+            if (res.message) {
+                alert(res.message);
+                var modal = bootstrap.Modal.getInstance(document.getElementById('addGoodsModal'));
+                modal.hide();
+                loadGoods(0);
+            } else { alert(res.error || '添加失败'); }
+        });
 }
 
 function deleteGoods(id) {
-    if (!confirm('确定删除此商品？')) return;
+    if (!confirm('确定删除该商品？')) return;
     fetch('/admin/goods/delete/' + id, { method: 'POST' }).then(r => r.json()).then(function(res) {
         if (res.result === 'ok') loadGoods(currentPage);
-        else alert('删除失败，商品可能有关联数据');
+        else alert('删除失败');
     });
 }
 
+loadTypesForSelect();
 loadGoods();
 </script>
 </body>

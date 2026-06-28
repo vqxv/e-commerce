@@ -1,27 +1,27 @@
 // 加载购物车侧边栏
 function loadCartSidebar() {
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', '/cart/view', true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.open('GET', '/cart/viewJson', true);
     xhr.onreadystatechange = function() {
         if (xhr.readyState === 4) {
+            var container = document.getElementById('cartItems');
+            var totalSpan = document.getElementById('cartTotal');
+            if (!container) return;
+            
             if (xhr.status === 200) {
                 try {
                     var items = JSON.parse(xhr.responseText);
-                    var container = document.getElementById('cartItems');
-                    var totalSpan = document.getElementById('cartTotal');
-                    if (!container) return;
-                    
                     if (Array.isArray(items) && items.length > 0) {
                         var html = '';
                         var total = 0;
                         items.forEach(function(item) {
-                            var price = item.price || (item.goods && item.goods.currentPrice) || 0;
-                            var qty = item.quantity || 0;
+                            var price = parseFloat(item.price) || 0;
+                            var qty = parseInt(item.quantity) || 0;
                             total += price * qty;
                             var goods = item.goods || {};
+                            var pic = goods.picture || '';
                             html += '<div class="d-flex align-items-center gap-3 mb-3 pb-2 border-bottom">';
-                            html += '<img src="/images/' + (goods.picture || 'default.jpg') + '" alt="" style="width:60px;height:60px;object-fit:cover;border-radius:8px;">';
+                            html += '<img src="/images/' + pic + '" alt="" style="width:60px;height:60px;object-fit:cover;border-radius:8px;" onerror="this.src=\'/images/default.jpg\'">';
                             html += '<div class="flex-grow-1">';
                             html += '<p class="mb-1 fw-bold">' + (goods.name || '') + '</p>';
                             html += '<span class="price-current">¥' + price.toFixed(2) + ' × ' + qty + '</span>';
@@ -30,17 +30,15 @@ function loadCartSidebar() {
                         container.innerHTML = html;
                         if (totalSpan) totalSpan.innerText = '¥' + total.toFixed(2);
                     } else {
-                        container.innerHTML = '<p class="text-center text-muted">购物车是空的</p>';
+                        container.innerHTML = '<p class="text-center text-muted py-4">购物车是空的</p>';
                         if (totalSpan) totalSpan.innerText = '¥0.00';
                     }
                 } catch(e) {
-                    console.log('购物车数据解析失败', e);
+                    container.innerHTML = '<p class="text-center text-muted py-4">加载失败</p>';
                 }
-            } else if (xhr.status === 302 || xhr.status === 301) {
-                // 重定向表示未登录，不做处理
-                return;
             } else {
-                console.log('加载购物车失败', xhr.status);
+                container.innerHTML = '<p class="text-center text-muted py-4">请先登录</p>';
+                if (totalSpan) totalSpan.innerText = '¥0.00';
             }
         }
     };

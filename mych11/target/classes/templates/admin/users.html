@@ -44,6 +44,10 @@
                 <button class="btn btn-sm btn-outline-secondary" id="prevPageBtn" onclick="changePage(currentPage - 1)">上一页</button>
                 <span id="pageInfo" class="text-muted">第 1 页</span>
                 <button class="btn btn-sm btn-outline-secondary" id="nextPageBtn" onclick="changePage(currentPage + 1)">下一页</button>
+                <div class="input-group" style="width: 150px;">
+                    <input type="number" class="form-control form-control-sm" id="gotoPageInput" placeholder="页码" min="1" style="border-radius:20px 0 0 20px;">
+                    <button class="btn btn-sm btn-admin" onclick="gotoPage()" style="border-radius:0 20px 20px 0;">跳转</button>
+                </div>
             </div>
         </div>
     </div>
@@ -53,31 +57,32 @@
 let currentPage = 0;
 let totalElements = 0;
 let totalPages = 0;
+const PAGE_SIZE = 10;
 
 function loadUsers(page) {
     currentPage = page || 0;
-    fetch('/admin/users/list')
-        .then(r => r.json())
+    fetch('/admin/users/list?page=' + currentPage + '&size=' + PAGE_SIZE)
+        .then(function(r) { return r.json(); })
         .then(function(data) {
-            totalElements = data.length;
-            totalPages = Math.ceil(totalElements / 10) || 1;
-            currentPage = Math.min(currentPage, totalPages - 1);
-            var start = currentPage * 10;
-            var end = Math.min(start + 10, totalElements);
-            var pageData = data.slice(start, end);
-            
+            totalElements = data.totalElements || 0;
+            totalPages = data.totalPages || 1;
             var tbody = document.getElementById('userTableBody');
             tbody.innerHTML = '';
-            pageData.forEach(function(u) {
-                tbody.innerHTML += '<tr>' +
-                    '<td>' + u.id + '</td>' +
-                    '<td>' + u.email + '</td>' +
-                    '<td>' + (u.role || 'USER') + '</td>' +
-                    '</tr>';
-            });
+            var items = data.content || [];
+            if (items.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">暂无用户数据</td></tr>';
+            } else {
+                items.forEach(function(u) {
+                    tbody.innerHTML += '<tr>' +
+                        '<td>' + u.id + '</td>' +
+                        '<td>' + u.email + '</td>' +
+                        '<td>' + (u.role || 'USER') + '</td>' +
+                        '</tr>';
+                });
+            }
             updatePagination();
         })
-        .catch(e => {
+        .catch(function(e) {
             console.error('加载用户失败:', e);
             document.getElementById('userTableBody').innerHTML = '<tr><td colspan="3" class="text-center text-muted">暂无用户数据</td></tr>';
         });
@@ -88,11 +93,21 @@ function updatePagination() {
     document.getElementById('pageInfo').textContent = '共 ' + totalElements + ' 条，第 ' + pageNum + '/' + totalPages + ' 页';
     document.getElementById('prevPageBtn').disabled = (currentPage <= 0);
     document.getElementById('nextPageBtn').disabled = (currentPage >= totalPages - 1);
+    document.getElementById('gotoPageInput').max = totalPages;
 }
 
 function changePage(newPage) {
     if (newPage < 0 || newPage >= totalPages) return;
     loadUsers(newPage);
+}
+
+function gotoPage() {
+    var input = document.getElementById('gotoPageInput');
+    var pageNum = parseInt(input.value) - 1;
+    if (pageNum >= 0 && pageNum < totalPages) {
+        loadUsers(pageNum);
+        input.value = '';
+    }
 }
 
 loadUsers();

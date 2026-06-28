@@ -1,5 +1,6 @@
 /workspace/mych11/src/main/java/com/ch/ebusiness/EbusinessApplication.java
 /workspace/mych11/src/main/java/com/ch/ebusiness/config/DataInitializer.java
+/workspace/mych11/src/main/java/com/ch/ebusiness/config/GlobalControllerAdvice.java
 /workspace/mych11/src/main/java/com/ch/ebusiness/config/SecurityConfig.java
 /workspace/mych11/src/main/java/com/ch/ebusiness/controller/AdminController.java
 /workspace/mych11/src/main/java/com/ch/ebusiness/controller/CartController.java

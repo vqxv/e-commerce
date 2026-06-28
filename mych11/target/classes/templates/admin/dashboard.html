@@ -2,11 +2,68 @@
 <html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>仪表盘 - 管理后台</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/style.css}">
-    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
     <th:block th:replace="~{admin/layout :: admin-css}"></th:block>
+    <style>
+        .stat-card {
+            display: flex;
+            align-items: center;
+            border-radius: 12px;
+            padding: 1.25rem;
+            min-height: 90px;
+            gap: 1rem;
+        }
+        .stat-icon {
+            flex-shrink: 0;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.2);
+            border-radius: 12px;
+            font-size: 1.5rem;
+        }
+        .stat-info {
+            flex: 1;
+            min-width: 0;
+            white-space: nowrap;
+        }
+        .stat-info h3 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fff;
+            line-height: 1.2;
+        }
+        .stat-info p {
+            margin: 2px 0 0;
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.2;
+        }
+        @media (max-width: 768px) {
+            .stat-card {
+                padding: 0.75rem;
+                min-height: 70px;
+                gap: 0.5rem;
+            }
+            .stat-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 1rem;
+            }
+            .stat-info h3 {
+                font-size: 1.1rem;
+            }
+            .stat-info p {
+                font-size: 0.75rem;
+            }
+        }
+    </style>
 </head>
 <body>
 <div class="admin-app">
@@ -36,25 +93,25 @@
                 <div class="col-6 col-md-3">
                     <div class="stat-card stat-blue">
                         <div class="stat-icon">&#128101;</div>
-                        <div class="stat-info"><h3 id="userCount" class="text-white" style="font-size: 1.5rem;">-</h3><p class="text-white-50 mb-0">总用户数</p></div>
+                        <div class="stat-info"><h3 id="userCount">-</h3><p>总用户数</p></div>
                     </div>
                 </div>
                 <div class="col-6 col-md-3">
                     <div class="stat-card stat-green">
                         <div class="stat-icon">&#128230;</div>
-                        <div class="stat-info"><h3 id="goodsCount" class="text-white" style="font-size: 1.5rem;">-</h3><p class="text-white-50 mb-0">总商品数</p></div>
+                        <div class="stat-info"><h3 id="goodsCount">-</h3><p>总商品数</p></div>
                     </div>
                 </div>
                 <div class="col-6 col-md-3">
                     <div class="stat-card stat-orange">
                         <div class="stat-icon">&#128203;</div>
-                        <div class="stat-info"><h3 id="orderCount" class="text-white" style="font-size: 1.5rem;">-</h3><p class="text-white-50 mb-0">总订单数</p></div>
+                        <div class="stat-info"><h3 id="orderCount">-</h3><p>总订单数</p></div>
                     </div>
                 </div>
                 <div class="col-6 col-md-3">
                     <div class="stat-card stat-red">
                         <div class="stat-icon">&#128176;</div>
-                        <div class="stat-info"><h3 id="totalSales" class="text-white" style="font-size: 1.5rem;">-</h3><p class="text-white-50 mb-0">总销售额</p></div>
+                        <div class="stat-info"><h3 id="totalSales">-</h3><p>总销售额</p></div>
                     </div>
                 </div>
             </div>
@@ -68,20 +125,22 @@
     </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
 <script>
 Promise.all([
-    fetch('/admin/users/list').then(r => r.json()),
+    fetch('/admin/users/list?page=0&size=1').then(r => r.json()),
     fetch('/admin/goods/list?page=0&size=1').then(r => r.json()),
-    fetch('/admin/orders/list').then(r => r.json()),
-    fetch('/admin/salesData')
+    fetch('/admin/orders/list?page=0&size=1000').then(r => r.json()),
+    fetch('/admin/salesData').then(r => r.json())
 ]).then(function(results) {
-    var users = results[0], goodsPage = results[1], orders = results[2], salesData = results[3];
-    document.getElementById('userCount').textContent = users.length;
+    var users = results[0], goodsPage = results[1], ordersPage = results[2], salesData = results[3];
+    document.getElementById('userCount').textContent = users.totalElements || users.length || 0;
     document.getElementById('goodsCount').textContent = goodsPage.totalElements || 0;
-    document.getElementById('orderCount').textContent = orders.length;
+    var orders = ordersPage.content || [];
+    document.getElementById('orderCount').textContent = ordersPage.totalElements || orders.length || 0;
     var totalSales = 0;
     orders.forEach(function(o) { if (o.status === 1) totalSales += (o.totalAmount || 0); });
-    document.getElementById('totalSales').textContent = '¥' + (totalSales < 10000 ? totalSales.toFixed(2) : totalSales.toFixed(0));
+    document.getElementById('totalSales').textContent = totalSales > 0 ? '¥' + (totalSales < 10000 ? totalSales.toFixed(2) : totalSales.toFixed(0)) : '¥0.00';
     var chart = echarts.init(document.getElementById('mainChart'));
     chart.setOption({
         tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },

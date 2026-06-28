@@ -2,11 +2,12 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>订单详情 - E-Shop</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link th:href="@{/css/style.css}" rel="stylesheet">
-    <script th:src="@{/js/common.js}"></script>
 </head>
-<body>
+<body style="background: linear-gradient(135deg, #f5f0ff, #ede6ff, #f8f4ff, #e8e0ff, #f5f0ff); background-size: 400% 400%; animation: bgFlow 10s ease infinite; min-height: 100vh;">
     <div th:replace="~{fragments/header :: header}"></div>
     <div class="container mt-5 pt-4">
         <h2 class="mb-3">订单详情</h2>
@@ -34,9 +35,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr th:each="item : ${order.orderItems}">
+                    <tr th:each="item : ${order.items}">
                         <td>
-                            <img th:src="@{/images/{img}(img=${item.goods.picture})}" class="rounded" style="width: 60px; height: 60px; object-fit: cover;">
+                    <img th:src="@{/images/{pic}(pic=${item.goods.picture})}" class="rounded" style="width: 60px; height: 60px; object-fit: cover;">
                         </td>
                         <td th:text="${item.goods.name}"></td>
                         <td class="text-danger">¥<span th:text="${item.price}"></span></td>
@@ -47,10 +48,12 @@
             </table>
         </div>
         <div class="mt-4">
-            <a th:href="@{/cart/myOrders}" class="btn btn-secondary">返回订单列表</a>
+            <a th:href="@{/cart/orders}" class="btn btn-secondary">返回订单列表</a>
             <button th:if="${order.status == 0}" class="btn btn-success ms-2" th:onclick="'payOrder('+${order.id}+')'">立即支付</button>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/common.js}"></script>
+<style> @keyframes bgFlow { 0% { background-position: 0% 50%; } 25% { background-position: 100% 50%; } 50% { background-position: 100% 100%; } 75% { background-position: 0% 100%; } 100% { background-position: 0% 50%; } } </style>
 </body>
 </html>
-

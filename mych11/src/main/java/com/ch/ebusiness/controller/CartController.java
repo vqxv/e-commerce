@@ -12,11 +12,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/cart")
-@PreAuthorize("hasRole('USER')")
 public class CartController {
 
     @Autowired
@@ -82,6 +83,31 @@ public class CartController {
             cartItemRepository.save(item);
         }
         return "ok";
+    }
+
+    /**
+     * 购物车列表JSON（供侧边栏使用）
+     */
+    @GetMapping("/viewJson")
+    @ResponseBody
+    public List<Map<String, Object>> viewCartJson() {
+        User user = getCurrentUser();
+        List<CartItem> items = cartItemRepository.findByUser(user);
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (CartItem item : items) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", item.getId());
+            map.put("quantity", item.getQuantity());
+            map.put("price", item.getGoods().getCurrentPrice());
+            Map<String, Object> goods = new HashMap<>();
+            goods.put("id", item.getGoods().getId());
+            goods.put("name", item.getGoods().getName());
+            goods.put("picture", item.getGoods().getPicture());
+            goods.put("currentPrice", item.getGoods().getCurrentPrice());
+            map.put("goods", goods);
+            result.add(map);
+        }
+        return result;
     }
 
     /**
@@ -184,8 +210,8 @@ public class CartController {
     /**
      * 我的收藏
      */
-    @GetMapping("/myFocus")
-    public String myFocus(Model model) {
+    @GetMapping("/focusList")
+    public String focus(Model model) {
         User user = getCurrentUser();
         model.addAttribute("focuses", focusRepository.findByUser(user));
         return "user/myFocus";
@@ -194,8 +220,8 @@ public class CartController {
     /**
      * 我的订单
      */
-    @GetMapping("/myOrders")
-    public String myOrders(Model model) {
+    @GetMapping("/orders")
+    public String orders(Model model) {
         User user = getCurrentUser();
         model.addAttribute("orders", orderRepository.findByUserOrderByCreateTimeDesc(user));
         return "user/myOrder";

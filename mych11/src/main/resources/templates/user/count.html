@@ -6,14 +6,14 @@
     <link th:href="@{/css/style.css}" rel="stylesheet">
     <script th:src="@{/js/common.js}"></script>
 </head>
-<body>
+<body style="background: linear-gradient(135deg, #f5f0ff, #ede6ff, #f8f4ff, #e8e0ff, #f5f0ff); background-size: 400% 400%; animation: bgFlow 10s ease infinite; min-height: 100vh;">
     <div th:replace="~{fragments/header :: header}"></div>
     <div class="container mt-4">
         <h2 class="mb-4">确认订单信息</h2>
         <div class="card shadow-sm">
             <div class="card-body">
                 <div th:each="item : ${cartItems}" class="d-flex align-items-center border-bottom pb-3 mb-3">
-                    <img th:src="@{/images/{img}(img=${item.goods.image})}" class="me-3 rounded" style="width: 80px; height: 80px; object-fit: cover;" alt="商品图">
+                    <img th:src="@{/images/{pic}(pic=${item.goods.picture})}" class="me-3 rounded" style="width: 80px; height: 80px; object-fit: cover;" alt="商品图">
                     <div class="flex-grow-1">
                         <h5 th:text="${item.goods.name}"></h5>
                         <span class="text-muted" th:text="${item.goods.currentPrice} + '元 x ' + ${item.quantity}"></span>
@@ -33,6 +33,7 @@
             </div>
         </div>
     </div>
+<style> @keyframes bgFlow { 0% { background-position: 0% 50%; } 25% { background-position: 100% 50%; } 50% { background-position: 100% 100%; } 75% { background-position: 0% 100%; } 100% { background-position: 0% 50%; } } </style>
 </body>
 </html>
 

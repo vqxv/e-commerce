@@ -6,19 +6,19 @@
             "name": "Run EbusinessApplication",
             "request": "launch",
             "mainClass": "com.ch.ebusiness.EbusinessApplication",
-            "projectName": "ch11",
-            "cwd": "${workspaceFolder}/ch11",
+            "projectName": "mych11",
+            "cwd": "${workspaceFolder}/mych11",
             "preLaunchTask": "Wait for MySQL"
         },
         {
             "type": "java",
-            "name": "Run ch11 (Maven)",
+            "name": "Run mych11 (Maven)",
             "request": "launch",
-            "cwd": "${workspaceFolder}/ch11",
+            "cwd": "${workspaceFolder}/mych11",
             "internalConsole": true,
             "mavenLaunchProfile": "",
             "command": "mvn spring-boot:run",
-            "envFile": "${workspaceFolder}/ch11/.env",
+            "envFile": "${workspaceFolder}/mych11/.env",
             "preLaunchTask": "Wait for MySQL"
         }
     ]

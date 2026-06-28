@@ -5,21 +5,21 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "cartitem")
+@Table(name = "carttable")
 public class CartItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "busertable_id")
     private User user;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "goods_id", nullable = false)
+    @JoinColumn(name = "goodstable_id")
     private Goods goods;
 
-    @Column(nullable = false)
-    private Integer quantity;
+    @Column(name = "shoppingnum", nullable = false)
+    private Integer quantity = 1;
 }

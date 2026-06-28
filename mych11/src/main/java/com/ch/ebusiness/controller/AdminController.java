@@ -86,8 +86,8 @@ public class AdminController {
     @GetMapping("/goods/list")
     @ResponseBody
     public Page<Goods> goodsList(@RequestParam(defaultValue = "0") int page,
-                                 @RequestParam(defaultValue = "5") int size) {
-        return goodsRepository.findAll(PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
+                                 @RequestParam(defaultValue = "10") int size) {
+        return goodsRepository.findAll(PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "id")));
     }
 
     @PostMapping("/goods/add")
@@ -178,8 +178,9 @@ public class AdminController {
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseBody
     @Transactional(readOnly = true)
-    public List<Order> ordersList() {
-        return orderRepository.findAll(Sort.by(Sort.Direction.DESC, "createTime"));
+    public Page<Order> ordersList(@RequestParam(defaultValue = "0") int page,
+                                  @RequestParam(defaultValue = "10") int size) {
+        return orderRepository.findAll(PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "id")));
     }
 
     @GetMapping("/users")
@@ -192,8 +193,9 @@ public class AdminController {
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseBody
     @Transactional(readOnly = true)
-    public List<User> usersList() {
-        return userRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
+    public Page<User> usersList(@RequestParam(defaultValue = "0") int page,
+                                @RequestParam(defaultValue = "10") int size) {
+        return userRepository.findAll(PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "id")));
     }
 
     private String saveFile(MultipartFile file) throws IOException {

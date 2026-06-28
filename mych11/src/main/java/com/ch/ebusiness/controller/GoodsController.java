@@ -4,8 +4,6 @@ import com.ch.ebusiness.entity.Goods;
 import com.ch.ebusiness.entity.GoodsType;
 import com.ch.ebusiness.repository.GoodsRepository;
 import com.ch.ebusiness.repository.GoodsTypeRepository;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,8 +27,7 @@ public class GoodsController {
     public String index(Model model) {
         List<Goods> advertisementGoods = goodsRepository.findByIsAdvertisement(1);
         List<Goods> recommendGoods = goodsRepository.findByIsRecommend(1);
-        List<Goods> lastedGoods = goodsRepository.findAll(
-                PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "id"))).getContent();
+        List<Goods> lastedGoods = goodsRepository.findAllByOrderByIdDesc();
         List<GoodsType> goodsTypeList = goodsTypeRepository.findAll();
 
         model.addAttribute("advertisementGoods", advertisementGoods);
@@ -49,10 +46,35 @@ public class GoodsController {
     }
 
     @GetMapping("/search")
-    public String search(@RequestParam("keyword") String keyword, Model model) {
-        List<Goods> goodsList = goodsRepository.findByNameContaining(keyword);
+    public String search(@RequestParam(name = "keyword", required = false) String keyword,
+                         @RequestParam(name = "typeId", required = false) Integer typeId,
+                         Model model) {
+        // 查询所有商品分类（供搜索页分类标签使用）
+        List<GoodsType> goodsTypeList = goodsTypeRepository.findAll();
+        model.addAttribute("goodsTypeList", goodsTypeList);
+
+        // 查询广告商品（供轮播图使用）
+        List<Goods> advertisementGoods = goodsRepository.findByIsAdvertisement(1);
+        model.addAttribute("advertisementGoods", advertisementGoods);
+
+        List<Goods> goodsList;
+
+        if (typeId != null) {
+            // 按分类ID查询
+            goodsList = goodsRepository.findByGoodsTypeId(typeId);
+            GoodsType currentType = goodsTypeRepository.findById(typeId).orElse(null);
+            model.addAttribute("currentType", currentType);
+            model.addAttribute("selectedTypeId", typeId);
+        } else if (keyword != null && !keyword.trim().isEmpty()) {
+            // 按关键词搜索
+            goodsList = goodsRepository.findByNameContaining(keyword.trim());
+            model.addAttribute("keyword", keyword.trim());
+        } else {
+            // 无过滤条件，显示所有商品
+            goodsList = goodsRepository.findAllByOrderByIdDesc();
+        }
+
         model.addAttribute("goodsList", goodsList);
-        model.addAttribute("keyword", keyword);
         return "user/searchResult";
     }
 }

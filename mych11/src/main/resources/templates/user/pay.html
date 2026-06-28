@@ -6,7 +6,7 @@
     <link th:href="@{/css/style.css}" rel="stylesheet">
     <script th:src="@{/js/common.js}"></script>
 </head>
-<body>
+<body style="background: linear-gradient(135deg, #f5f0ff, #ede6ff, #f8f4ff, #e8e0ff, #f5f0ff); background-size: 400% 400%; animation: bgFlow 10s ease infinite; min-height: 100vh;">
     <div th:replace="~{fragments/header :: header}"></div>
     <div class="container mt-5">
         <div class="row justify-content-center">
@@ -51,6 +51,7 @@
             });
         }
     </script>
+<style> @keyframes bgFlow { 0% { background-position: 0% 50%; } 25% { background-position: 100% 50%; } 50% { background-position: 100% 100%; } 75% { background-position: 0% 100%; } 100% { background-position: 0% 50%; } } </style>
 </body>
 </html>
 

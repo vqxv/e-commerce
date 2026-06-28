@@ -1,5 +1,6 @@
 package com.ch.ebusiness.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -13,20 +14,21 @@ import java.util.Collections;
 @Data
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "orders", "cartItems", "focusList"})
 @Entity
-@Table(name = "users")
+@Table(name = "busertable")
 public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false, unique = true, length = 100)
+    @Column(name = "bemail", nullable = false, unique = true, length = 100)
     private String email;
 
-    @Column(nullable = false)
+    @JsonIgnore
+    @Column(name = "bpwd", nullable = false)
     private String password;
 
-    @Column(nullable = false, length = 20)
+    @Column(name = "role", nullable = false, length = 20)
     private String role = "USER";
 
     @Override

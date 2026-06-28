@@ -113,7 +113,7 @@ public class SecurityConfig {
                 .requestMatchers("/", "/index", "/goodsDetail", "/search").permitAll()
                 .requestMatchers("/user/**").permitAll()
                 .requestMatchers("/cart/add", "/cart/focus", "/cart/delete/**", "/cart/clear", "/cart/submitOrder", "/cart/pay/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/cart/view", "/cart/myFocus", "/cart/myOrders", "/cart/orderDetail/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/cart/view", "/cart/viewJson", "/cart/focusList", "/cart/orders", "/cart/orderDetail/**").hasAnyRole("USER", "ADMIN")
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form

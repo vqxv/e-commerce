@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface GoodsTypeRepository extends JpaRepository<GoodsType, Integer> {
+    GoodsType findByTypename(String typename);
 }

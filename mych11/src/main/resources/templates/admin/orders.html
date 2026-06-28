@@ -44,6 +44,10 @@
                 <button class="btn btn-sm btn-outline-secondary" id="prevPageBtn" onclick="changePage(currentPage - 1)">上一页</button>
                 <span id="pageInfo" class="text-muted">第 1 页</span>
                 <button class="btn btn-sm btn-outline-secondary" id="nextPageBtn" onclick="changePage(currentPage + 1)">下一页</button>
+                <div class="input-group" style="width: 150px;">
+                    <input type="number" class="form-control form-control-sm" id="gotoPageInput" placeholder="页码" min="1" style="border-radius:20px 0 0 20px;">
+                    <button class="btn btn-sm btn-admin" onclick="gotoPage()" style="border-radius:0 20px 20px 0;">跳转</button>
+                </div>
             </div>
         </div>
     </div>
@@ -53,38 +57,42 @@
 let currentPage = 0;
 let totalElements = 0;
 let totalPages = 0;
+const PAGE_SIZE = 10;
 
 function getStatusText(status) {
-    const map = { 0: '待付款', 1: '已付款', 2: '已发货', 3: '已完成', -1: '已取消' };
+    const map = { 0: '待付款', 1: '已付款', 2: '已发货', 3: '已完成', '-1': '已取消' };
     return map[status] || '未知';
 }
 
 function loadOrders(page) {
     currentPage = page || 0;
-    fetch('/admin/orders/list')
-        .then(r => r.json())
+    fetch('/admin/orders/list?page=' + currentPage + '&size=' + PAGE_SIZE)
+        .then(function(r) { return r.json(); })
         .then(function(data) {
-            totalElements = data.length;
-            totalPages = Math.ceil(totalElements / 10) || 1;
-            currentPage = Math.min(currentPage, totalPages - 1);
-            var start = currentPage * 10;
-            var end = Math.min(start + 10, totalElements);
-            var pageData = data.slice(start, end);
-            
+            totalElements = data.totalElements || 0;
+            totalPages = data.totalPages || 1;
             var tbody = document.getElementById('orderTableBody');
             tbody.innerHTML = '';
-            pageData.forEach(function(o) {
-                tbody.innerHTML += '<tr>' +
-                    '<td>' + o.id + '</td>' +
-                    '<td>' + (o.user ? o.user.email : '-') + '</td>' +
-                    '<td>¥' + (o.totalAmount || 0) + '</td>' +
-                    '<td>' + getStatusText(o.status) + '</td>' +
-                    '<td>' + (o.createTime ? o.createTime.replace('T', ' ') : '-') + '</td>' +
-                    '</tr>';
-            });
+            var items = data.content || [];
+            if (items.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">暂无订单数据</td></tr>';
+            } else {
+                items.forEach(function(o) {
+                    var statusText = getStatusText(o.status);
+                    var amount = o.totalAmount != null ? '¥' + Number(o.totalAmount).toFixed(2) : '¥0.00';
+                    var time = o.createTime ? o.createTime.replace('T', ' ') : '-';
+                    tbody.innerHTML += '<tr>' +
+                        '<td>' + o.id + '</td>' +
+                        '<td>' + (o.user && o.user.email ? o.user.email : '-') + '</td>' +
+                        '<td>' + amount + '</td>' +
+                        '<td>' + statusText + '</td>' +
+                        '<td>' + time + '</td>' +
+                        '</tr>';
+                });
+            }
             updatePagination();
         })
-        .catch(e => {
+        .catch(function(e) {
             console.error('加载订单失败:', e);
             document.getElementById('orderTableBody').innerHTML = '<tr><td colspan="5" class="text-center text-muted">暂无订单数据</td></tr>';
         });
@@ -95,11 +103,21 @@ function updatePagination() {
     document.getElementById('pageInfo').textContent = '共 ' + totalElements + ' 条，第 ' + pageNum + '/' + totalPages + ' 页';
     document.getElementById('prevPageBtn').disabled = (currentPage <= 0);
     document.getElementById('nextPageBtn').disabled = (currentPage >= totalPages - 1);
+    document.getElementById('gotoPageInput').max = totalPages;
 }
 
 function changePage(newPage) {
     if (newPage < 0 || newPage >= totalPages) return;
     loadOrders(newPage);
+}
+
+function gotoPage() {
+    var input = document.getElementById('gotoPageInput');
+    var pageNum = parseInt(input.value) - 1;
+    if (pageNum >= 0 && pageNum < totalPages) {
+        loadOrders(pageNum);
+        input.value = '';
+    }
 }
 
 loadOrders();

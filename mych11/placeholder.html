@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>商品占位图生成</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
+h1 { text-align: center; margin-bottom: 30px; color: #333; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; max-width: 1600px; margin: 0 auto; }
+.card { border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+.card-body { padding: 20px; text-align: center; }
+.placeholder-img { width: 100%; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+.card-footer { padding: 10px; background: rgba(0,0,0,0.05); text-align: center; font-size: 14px; color: #666; }
+.color-1  { background: linear-gradient(135deg, #667eea, #764ba2); }
+.color-2  { background: linear-gradient(135deg, #f093fb, #f5576c); }
+.color-3  { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+.color-4  { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+.color-5  { background: linear-gradient(135deg, #fa709a, #fee140); }
+.color-6  { background: linear-gradient(135deg, #a18cd1, #fbc2eb); }
+.color-7  { background: linear-gradient(135deg, #fccb90, #d57eeb); }
+.color-8  { background: linear-gradient(135deg, #e0c3fc, #8ec5fc); }
+.color-9  { background: linear-gradient(135deg, #f5576c, #ff6f91); }
+.color-10 { background: linear-gradient(135deg, #30cfd0, #330867); }
+.color-11 { background: linear-gradient(135deg, #a8edea, #fed6e3); color: #333; }
+.color-12 { background: linear-gradient(135deg, #d4fc79, #96e6a1); }
+.color-13 { background: linear-gradient(135deg, #84fab0, #8fd3f4); }
+.color-14 { background: linear-gradient(135deg, #cfd9df, #e2ebf0); color: #333; }
+.color-15 { background: linear-gradient(135deg, #a6c0fe, #f68084); }
+</style>
+</head>
+<body>
+<h1>🛒 商品占位图</h1>
+<div class="grid">
+  <div class="card"><div class="placeholder-img color-1">📱 iPhone 15 Pro</div><div class="card-footer">phone.jpg — 800×800</div></div>
+  <div class="card"><div class="placeholder-img color-2">💻 MacBook Air M3</div><div class="card-footer">laptop.jpg — 800×800</div></div>
+  <div class="card"><div class="placeholder-img color-3">🎧 Sony降噪耳机</div><div class="card-footer">headphones.jpg — 800×800</div></div>
+  <div class="card"><div class="placeholder-img color-4">📱 iPad Air</div><div class="card-footer">tablet.jpg — 800×800</div></div>
+  <div class="card"><div class="placeholder-img color-5">⌨️ 机械键盘</div><div class="card-footer">keyboard.jpg — 800×800</div></div>
+  <div class="card"><div class="placeholder-img color-6">🖱️ 无线鼠标</div><div class="card-footer">mouse.jpg — 800×800</div></div>
+  <div class="card"><div class="placeholder-img color-7">👟 Nike Air Max</div><div class="card-footer">shoes.jpg — 800×800</div></div>
+  <div class="card"><div class="placeholder-img color-8">🧥 优衣库羽绒服</div><div class="card-footer">jacket.jpg — 800×800</div></div>
+  <div class="card"><div class="placeholder-img color-9">👕 休闲T恤</div><div class="card-footer">tshirt.jpg — 800×800</div></div>
+  <div class="card"><div class="placeholder-img color-10">👖 运动长裤</div><div class="card-footer">pants.jpg — 800×800</div></div>
+  <div class="card"><div class="placeholder-img color-11">💡 智能台灯</div><div class="card-footer">lamp.jpg — 800×800</div></div>
+  <div class="card"><div class="placeholder-img color-12">🥤 保温水杯</div><div class="card-footer">water.jpg — 800×800</div></div>
+  <div class="card"><div class="placeholder-img color-13">📚 Java核心技术</div><div class="card-footer">book1.jpg — 800×800</div></div>
+  <div class="card"><div class="placeholder-img color-14">⌚ Apple Watch SE</div><div class="card-footer">watch.jpg — 800×800</div></div>
+  <div class="card"><div class="placeholder-img color-15">🎧 入耳式耳机</div><div class="card-footer">earphone.jpg — 800×800</div></div>
+</div>
+<div style="text-align:center;margin:40px 0;padding:20px;background:#fff;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,0.05);">
+  <p style="margin-bottom:10px;color:#666;">使用截图工具（如系统截图、Snipaste）将每张图截取，保存为对应文件名</p>
+  <p style="color:#999;font-size:14px;">建议截图尺寸至少 400×400 像素</p>
+</div>
+</body>
+</html>
