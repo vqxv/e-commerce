@@ -46,19 +46,25 @@ public class CartController {
     @PostMapping("/focus")
     @ResponseBody
     @Transactional
-    public String focus(@RequestParam Integer goodsId) {
+    public Map<String, Object> focus(@RequestParam Integer goodsId) {
         User user = getCurrentUser();
+        Map<String, Object> result = new HashMap<>();
         if (focusRepository.existsByUserAndGoodsId(user, goodsId)) {
             focusRepository.deleteByUserAndGoodsId(user, goodsId);
-            return "no";
+            result.put("action", "unfocused");
+            result.put("focused", false);
+        } else {
+            Focus focus = new Focus();
+            focus.setUser(user);
+            Goods goods = goodsRepository.findById(goodsId)
+                    .orElseThrow(() -> new RuntimeException("商品不存在"));
+            focus.setGoods(goods);
+            focusRepository.save(focus);
+            result.put("action", "focused");
+            result.put("focused", true);
         }
-        Focus focus = new Focus();
-        focus.setUser(user);
-        Goods goods = goodsRepository.findById(goodsId)
-                .orElseThrow(() -> new RuntimeException("商品不存在"));
-        focus.setGoods(goods);
-        focusRepository.save(focus);
-        return "ok";
+        result.put("status", "ok");
+        return result;
     }
 
     /**

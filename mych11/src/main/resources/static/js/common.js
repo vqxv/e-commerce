@@ -96,7 +96,7 @@ function addToCart(goodsId, quantity, btn) {
     xhr.send('goodsId=' + goodsId + '&quantity=' + quantity);
 }
 
-// 收藏/取消收藏
+// 收藏/取消收藏（首页/详情页用，只改文字）
 function focusGoods(goodsId, btn) {
     var xhr = new XMLHttpRequest();
     xhr.open('POST', '/cart/focus', true);
@@ -104,16 +104,93 @@ function focusGoods(goodsId, btn) {
     xhr.onreadystatechange = function() {
         if (xhr.readyState === 4) {
             if (xhr.status === 200) {
-                var response = xhr.responseText.trim();
-                if (response === 'ok') {
-                    if (btn) {
-                        btn.classList.add('heart-beat');
-                        setTimeout(function() { 
-                            btn.classList.remove('heart-beat'); 
-                        }, 400);
+                try {
+                    var res = JSON.parse(xhr.responseText);
+                    if (res.status === 'ok') {
+                        if (btn) {
+                            if (res.focused) {
+                                btn.classList.add('focused');
+                                btn.title = '取消收藏';
+                                // 更新按钮文字
+                                var icon = '♥ ';
+                                var text = '收藏';
+                                var originalText = btn.textContent.trim();
+                                if (originalText.startsWith('♥') || originalText.includes('♥')) {
+                                    text = '已收藏';
+                                }
+                                btn.textContent = icon + text;
+                            } else {
+                                btn.classList.remove('focused');
+                                btn.title = '收藏';
+                                // 更新按钮文字
+                                var icon = '♥ ';
+                                var text = '收藏';
+                                btn.textContent = icon + text;
+                            }
+                            btn.classList.add('heart-beat');
+                            setTimeout(function() { 
+                                btn.classList.remove('heart-beat'); 
+                            }, 400);
+                        }
+                    } else {
+                        alert('操作失败');
                     }
-                } else {
-                    alert(response || '请先登录');
+                } catch(e) {
+                    alert('请先登录');
+                    window.location.href = '/user/toLogin';
+                }
+            } else if (xhr.status === 302 || xhr.status === 301) {
+                alert('请先登录');
+                window.location.href = '/user/toLogin';
+            } else {
+                alert('收藏失败，请重试');
+            }
+        }
+    };
+    xhr.send('goodsId=' + goodsId);
+}
+
+// 收藏页面用，改文字后刷新
+function focusGoodsInPage(goodsId, btn) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/cart/focus', true);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                try {
+                    var res = JSON.parse(xhr.responseText);
+                    if (res.status === 'ok') {
+                        if (btn) {
+                            if (res.focused) {
+                                btn.classList.add('focused');
+                                btn.title = '取消收藏';
+                                var icon = '♥ ';
+                                var text = '收藏';
+                                var originalText = btn.textContent.trim();
+                                if (originalText.startsWith('♥') || originalText.includes('♥')) {
+                                    text = '已收藏';
+                                }
+                                btn.textContent = icon + text;
+                            } else {
+                                btn.classList.remove('focused');
+                                btn.title = '收藏';
+                                var icon = '♥ ';
+                                var text = '收藏';
+                                btn.textContent = icon + text;
+                            }
+                            btn.classList.add('heart-beat');
+                            setTimeout(function() { 
+                                btn.classList.remove('heart-beat'); 
+                            }, 400);
+                        }
+                        // 收藏页面需要刷新
+                        location.reload();
+                    } else {
+                        alert('操作失败');
+                    }
+                } catch(e) {
+                    alert('请先登录');
                     window.location.href = '/user/toLogin';
                 }
             } else if (xhr.status === 302 || xhr.status === 301) {

@@ -33,7 +33,7 @@
                         </p>
                         <div class="mt-auto d-flex gap-2">
                             <button class="btn btn-sm btn-primary" th:onclick="'addToCart('+${f.goods.id}+',1,this)'">🛒</button>
-                            <button class="btn btn-sm btn-outline-danger" th:onclick="'focusGoods('+${f.goods.id}+',this)'">取消收藏</button>
+                            <button class="btn btn-sm btn-outline-danger" th:onclick="'focusGoodsInPage('+${f.goods.id}+',this)'">取消收藏</button>
                         </div>
                     </div>
                 </div>
